@@ -1,2 +1,5 @@
 # mathylinks
-Links for resources, materials, videos, software useful for understanding mathematics
+
+## Algebraic topology
+
+[From an octagon to a genus 2 surface](https://youtu.be/G1yyfPShgqw) (Youtube animation)
