@@ -195,5 +195,94 @@ fn returns_summarizable() -> impl Summary {
 // LIFETIME ANNOTATIONS ==============================
 // ===================================================
 
+// Every reference has a lifetime and we need to specify lifetime parameters
+//                                for functions or structs that use references
 
-    
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {  // The returned reference will be valid as long as
+                                                     // both the parameters are valid     
+    /* The function signature tells Rust that
+     * for some lifetime 'a, the function takes
+     * two parameters, both live as least as long as
+     * the lifetime 'a, and that the returned string slice
+     * lives as at least as long as lifetime 'a.
+     */
+}
+
+/* When returning a reference from a function,
+ *                the lifetime parameter for the return type needs to match
+ *                the lifetime parameter for one of the parameters
+ *
+ * If the reference returned does not refer to one of the parameters,
+ *                it must refer to a value created within the function.
+ *                However, this would be a dangling reference. => compilation error
+ *
+ * This way, Rust prevents dangling references and allow only memory-safe operations.
+ */
+
+// Lifetime annotations in struct definitions . . .
+
+/*
+ * structs can hold references, but in that case we need a lifetime annotation
+ *                              on every reference in the stuct's definition
+ */
+
+struct Excerpt<'a> { // an instance of Excerpt cannot outlive the reference it holds in its part field
+    part: &'a str,
+}
+
+// Lifetime elision . . .
+
+/*
+ * In certain cases, compiler allows not specifying lifetime annonations: it infers
+ *
+ * Input  := parameters in the function
+ * Output := the returned
+ *
+ * Some rules about how compiler assigns lifetime annotations
+ * (1) Compiler assigns a lifetime parameter to each parameter which is a reference
+ * (2) If there is only one input lifetime parameter,
+ *              that lifetime is assigned to all output lifetime parameters
+ * (3) If there are multiple input parameters and one of them is &self or &mut self,
+ *              the lifetime of self is assigned to all output lifetime parameters
+ *
+ * This is why the following will result in a compile error,
+ *              because the compiler can't infer the lifetime parameter of the output
+ */
+
+fn function(x: &str, y: &str) -> &str {        // won't compile
+    //
+}
+
+/*
+ * In the above, by rule (1), compiler assigns x: &'a str, y: &'b str
+ *               rule (2) doesn't apply because there are multiple inputs
+ *               rule (3) doesn't apply either, because there is no &self or &mut self
+ * So, the compiler can't infer the lifetime parameter of the output,
+ *               hence the compilation error
+ */
+
+// Lifetime annotations in method definitions . . .
+
+impl<'a> Excerpt<'a> {  // Put lifetime annotations after impl and then after struct name
+    fn level(&self) -> i32 {
+	3
+    }
+}
+
+// the thid rule applies to the following case:
+
+impl<'a> Excerpt<'a> {
+    fn announce(&self, a: &str) -> &str {
+	self.part
+    }
+}
+
+// The static lifetime . . .
+
+/*
+ * All string literals have static lifetime: entire duration of the program
+ * The text of the literal is stored directly in the binary.
+ */
+
+let s: &'static str = "I have a static lifetime.";
+
