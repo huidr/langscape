@@ -1,7 +1,7 @@
 /*
  * ON STACK AND HEAP
  *
- * All data stored on the stack must have a known, fixed size.
+ * All data stored on the stack must have a known, fixed size. 
  * Data with an unknown size at compile time or a size that might change
  *              must be stored on the heap instead.
  * 
@@ -12,7 +12,7 @@
  *             get pused onto the stack. When the function is over,
  *             those values get popped off the stack.
  *
- * The main prupose of ownership is to manage heap data.
+ * The main purpose of ownership is to manage heap data.
  *
  * OWNERSHIP RULES
  * Each value in Rust has an owner.
@@ -26,8 +26,6 @@
  * Rust calls drop function to free memory when variables go out of scope
  */
 
-
-
 let mut s = String::from("hello");      // requests memory at runtime
 s.push_str(", world!");                     
 
@@ -35,6 +33,7 @@ let mut s1 = String::from("string");
 let s2 = s1;                            // move: Rust now considers s1 invalid
 
 let s1 = String::from("new string");
+
 /* 
  * the heap memory previously pointed to by s has been freed
  *          that is, the original string immediately goes out of scope
@@ -70,12 +69,27 @@ fn makes_copy(some_integer: i32) { // some_integer comes into scope
     println!("{some_integer}");
 } // Here, some_integer goes out of scope. Nothing special happens.
 
+let mut s1 = String::from("Good");
+let s2 = " Will".to_string();      // s2 is String
+s1.push_str(&s2);                  // push_str needs &str argument
+                                   // s1.push_str(s2) would fail
+                                   // s1.push_str(" Will") will work
+
+// s1 = s1 + " Hunting"            // concatenation: String + &str + &str + ...
+let s3 = s1 + " Hunt" + "ing";     // s1 loses ownership
+let s4 = s3;                       // s3 loses ownership
+let s5 = s3.clone();               // s3 does not lose ownership
+let s6 = &s3;                      // s3 does not lose ownsership
+
+println!("{:?}", *s6);             // println!("{:?}", s6); also works
+
 /*
  * Consider cloning a String before sending it to a function as argument
  *          if you still want to use it after the call
  *
  * The ownership of a variable follows the same pattern every time:
  *          assigning a value to another variable moves it.
+ *          (for those not having Copy trait?)
  * 
  * When a variable that includes data on the heap goes out of scope,
  *          the value will be cleaned up by drop unless

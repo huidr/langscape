@@ -32,8 +32,8 @@ let mut y = 5;                           // mutable
 
 let x = x + 1;                           // shadowing (redefining)
 {
-    x = x * 2;                           // shadowing (block slope)
-}
+    let x = x * 2;                       // shadowing (block slope)
+}                                        // end of scope for x inside { }
 
 let spaces = "   ";                      // use of shadowing
 let spaces = spaces.len();               // no need to define another variable
@@ -106,7 +106,7 @@ let y = {
 // CONTROL FLOW --------------------------------------------------
 
 // if, if else, if else if:  condition must be a bool
-// Rust do not automatically convert non-bool into bool
+// Rust does not automatically convert non-bool into bool
 
 if y > 5 {
     println!("Greater");
@@ -186,7 +186,37 @@ for number in 0..5 {                  // 0, 1, 2, 3, 4
     println!("{number}");
 }
 
+let var = [1, 2, 3, 4, 5];
+for number in 0..var.len() {
+    println!("{number}");
+}
+
 for number in (0..5).rev() {          // 4, 3, 2, 1, 0 (reverse)
     println!("{number}");
 }
+
+// ============================================================================
+
+/*
+
+Strings:
+(1) Use &str when you need a read-only view of a string (e.g., function parameters, borrowing string data).
+(2) Use String (a growable, owned string type) when you need to modify or own the string data.
+(3) str is rarely used directly but is the underlying data type for &str and String.
+
+*/
+
+
+// Differences between the following:
+
+let b = &mut a;   // b is an immutable variable but
+                  //       a   mutable reference to a (a must be mutable)
+
+let mut b = &a;   // b is a mutable variable and immutable reference to a
+                  // b can  point to some other variable but
+                  //   cant modify value of a
+
+let mut b = &mut a;
+
+
 

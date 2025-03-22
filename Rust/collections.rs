@@ -8,7 +8,7 @@
  *    2. all values next to each other in memory
  */
 
-let v: Vec<i32> = Vec::new();     // type annotation
+let mut v: Vec<i32> = Vec::new(); // type annotation
 
 let v = vec![1, 2, 3];            // type inference
 
@@ -16,11 +16,19 @@ let v = vec![1, 2, 3];            // type inference
 let mut v = Vec::new();
 v.push(5);                        // type inference
 
+let mut x = v.pop().unwrap();     // because v.pop() returns Some<T>
+x = v.pop().unwrap_or(0);         // if v is empty, it returns None
+
 // reading elements
 let element: &i32 = &v[2];        // annotation not necessary
                                   // Using & and [] gives us a reference
 
+let x = &mut v[1];                // want to modify the value
+x = 4;
+
 let element: Option<&i32> = v.get(2);  // we get Option<&T>
+
+let x = v.get(0).unwrap_or(&0);   // &0; because it returns Option<&T>
 
 // we can use Option<&T> with match
 match element {
@@ -51,6 +59,9 @@ let mut v = vec![1, 2, 3, 4, 5];
 let first = &v[0];       // immutable reference to the first element
 
 v.push(6);               // mutable borrow
+println!("{:?}", v);     // compiles until here
+
+println!("{}", first);   // immutable borrow again
 
 /*
  * because vectors put the values next to each other in memory,
@@ -83,6 +94,9 @@ for i in &mut v {                   // mutable reference
  * simultaneous modification of the whole vector.
  */
 
+// Iterating over a vector directly (not using reference) takes ownership, and
+//                  vector ceases to exist after the iteration
+   
 // using an enum to store multiple types . . .
 
 enum SpreadsheetCell {
@@ -135,14 +149,14 @@ let row = vec![
  * 
  * string slices are references to some UTF-8 encoded string data
  * stored elsewhere.
- * String literals are stored in the program’s binary
+ * string literals are stored in the program’s binary
  * and are therefore string slices.
  *
  * The String type, which is provided by Rust’s standard library
  * rather than coded into the core language, is a growable, mutable,
  * owned, UTF-8 encoded string type.
  */
-
+  
 /*
  * Many of the same operations available with Vec<T> are available with
  * String as well because String is actually implemented as a wrapper
@@ -150,7 +164,7 @@ let row = vec![
  * restrictions, and capabilities.
  */
 
-let mut s = String:new();
+let mut s = String::new();
 
 // to_string() can also be used on any type that implements
 // the Display trait (e.g. string literals)

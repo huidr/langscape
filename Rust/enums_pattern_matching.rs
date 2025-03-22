@@ -86,7 +86,8 @@ enum Option<T> {              // defined in standard library
 
 // The Option<T> enum is so useful that it’s even included in the prelude;
 //               you don’t need to bring it into scope explicitly.
-// Its variants are also included in the prelude: you can use Some and None //               directly without the Option:: prefix.
+// Its variants are also included in the prelude: you can use Some and None
+//               directly without the Option:: prefix.
 // The Option<T> enum is still just a regular enum, and Some(T) and None
 //               are still variants of type Option<T>.
 
