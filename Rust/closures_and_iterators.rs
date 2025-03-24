@@ -41,3 +41,33 @@ take_ownership();
  * (4) capture nothing from the environment to begin with. 
  */
 
+// Some uses of closures
+
+// Pass closures as arguments to higher-order functions like map, filter and fold
+let v = vec![1, 2, 3];
+let w: Vec<_> = v.iter().map(|x| x * 2).collect();
+
+// Store closures in variables for future use: lazy evaluation?
+let greet = || printlln!("Hello, world");
+greet();
+
+// Return closures from functions
+fn create_multiplier(factor: i32) -> impl Fn(i32) -> i32 {
+    move |x| x * factor
+}
+
+let doubler = create_multiplier(2);
+let tripler = create_multiplier(3);
+let mut a = 4;
+println!("{}", doubler(a));
+
+// Capture variables from their surrounding scope, either by reference or by value
+
+let add_x = |x| x + a; // captures a, by reference
+a = add_x(6);
+
+let add_x = move |x| x + a; // capture a, by value
+a = add_x(6);
+
+
+
