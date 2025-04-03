@@ -38,7 +38,7 @@ dct = Dict(1 => 1, 2 => 4, 3 => 9.2)               # Dict{Int64, Real} with 3 en
 dct = Dict("a" => 4, "b" => 6, 'c' => "Julia")     # Dict{Any, Any} with 3 entries
 dct['d'] = 8                                       # add new key => value pair
 
-s = Set([ 1, 2, 3, 4, 5)]                          # Set{Int64} with 4 elements
+s = Set([ 1, 2, 3, 4, 5])                          # Set{Int64} with 4 elements
 s = Set([ "Julia", "Rust", "Lisp", "Assembly" ])   # Set{String} with 4 elements
 s = Set([ 1, "Julia" ])                            # Set{Any} with 2 elements
 
@@ -199,3 +199,8 @@ today()
 
 using Dates                 # import all exported names
 today()              
+
+# Greek letters
+ϕ(a, b) = b, a              # swap function, type \phi then <TAB>
+Π(a, b) = a * b             # \Pi <TAB>
+
