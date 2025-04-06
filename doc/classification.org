@@ -2,9 +2,8 @@
 #+author:
 #+date: 2025-04-06
 
-* Compiled languages
-
-** Those that compile to a single binary executable
+** Compiled languages
+*** Those that compile to a single binary executable
 
 - Language/compiler agnostic
   + A binary is just machine code (e.g., x86_64, ARM
@@ -34,7 +33,7 @@
   + Haskell (=ghc=)
   + Rust (=rustc=)
 
-** JIT-compiled languages
+*** JIT-compiled languages
 
 - No =main= (usually): Code is compiled at runtime, so execution
   starts dynamically.
@@ -47,7 +46,7 @@
     OS) calls it.
   + Julia 
     
-* Intepreted languages
+*** Intepreted languages
 
 - No =main= function required: The interpreter executes the script
   line-by-line.
@@ -59,8 +58,8 @@
   + Bash (.sh)
   + Python (.py)
 
-* Popular languages
-** Single Binary (AOT-Compiled)
+** Popular languages
+*** Single Binary (AOT-Compiled)
 
 These languages compile directly to machine code and produce
 standalone executables.
@@ -76,7 +75,7 @@ standalone executables.
 | Swift    | swifttc (LLVM-based)           | AOT for apps, JIT in playgrounds                          |
 | Zig      | zig build-exe                  | AOT-compiled, ships with cross-compilation support        |
 
-** JIT-compiled
+*** JIT-compiled
 
 These languages compile to intermediate code, which is then
 JIT-compiled at runtime.
@@ -91,7 +90,7 @@ JIT-compiled at runtime.
 | Python (PyPy) | PyPy (RPython JIT)                  | Alternative to CPython with JIT optimizations       |
 | R (FastR)     | GraalVM                             | Alternative R implementation with JIT               |
 
-** Runtime Environment (Bytecode + VM)
+*** Runtime Environment (Bytecode + VM)
 
 These languages compile to bytecode, which is executed by a virtual
 machine (not strictly JIT).
@@ -104,7 +103,7 @@ machine (not strictly JIT).
 | Scala       | JVM                     | Hybrid OOP/FP on JVM                                     |
 | WebAssembly | WASM runtimes (wasmtime | Portable bytecode for browsers/servers                   |
 
-** Intepreted (no compilation)
+*** Intepreted (no compilation)
 
 These languages are executed line-by-line by an interpreter.
 
@@ -122,7 +121,7 @@ These languages are executed line-by-line by an interpreter.
 | TypeScript   | tsc (compiles to JS)         | TS is transpiled to JS, then interpreted/JITed         |
 | CoffeeScript | coffee (compiles to JS)      | TS is transpiled to JS, then interpreted/JITed         |
 
-** Special languages
+*** Special languages
 
 | Language    | Classification               | Notes                                                      |
 |-------------+------------------------------+------------------------------------------------------------|
@@ -131,16 +130,18 @@ These languages are executed line-by-line by an interpreter.
 | Haskell     | Both AOT and interpreted     | GHC compiles to binary, but GHCi is interactive (bytecode) |
 | Nim         | AOT or JS                    | Can compile to C (binary) or JavaScript                    |
 
-* Which language to choose?
-
-** Quick guide
+** Which language to choose?
+*** Quick guide
 
 - Single Binary (AOT): Best for performance/deployment (C, Rust, Go)
 - JIT: Balances speed and flexibility (Java, C#, Julia, JS)
 - Runtime/VM: Portable bytecode (JVM, BEAM, WASM).
 - Interpreted: Fast development, slower execution (Python, Bash).
 
-** Language selection decision tree
+*** Language selection decision tree
+
+Check this out [[language-decision-tree.org][language-decision-tree.org]]
+
 
 Is the tool/project:
 ├── **Long-lived?**  
