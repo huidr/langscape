@@ -1,6 +1,7 @@
 #+title: Types of Programming Languages
 #+author:
 #+date: 2025-04-06
+#+OPTIONS: ^:nil  ;; Disable superscript interpretation of carets
 
 ** Compiled languages
 *** Those that compile to a single binary executable
@@ -142,32 +143,8 @@ These languages are executed line-by-line by an interpreter.
 
 Check this out [[language-decision-tree.org][language-decision-tree.org]]
 
-
-Is the tool/project:
-├── **Long-lived?**  
-│   ├── **Performance-critical?**  
-│   │   ├── Systems programming (OS/kernel/drivers)? → **C**/**Rust**/**Zig**  
-│   │   ├── High-throughput servers? → **Rust**/**Go**/**Java** (JIT)  
-│   │   └── Numeric/scientific computing? → **Rust**/**Julia**/**C++**  
-│   │  
-│   └── **Needs easy distribution?**  
-│       ├── Cross-platform GUI? → **Rust** (Tauri)/**C#** (Avalonia)/**Kotlin** (Compose)  
-│       ├── CLI tool? → **Go** (static binary)/**Rust** (clap)/**OCaml**  
-│       └── Embedded? → **C**/**Rust**/**Zig** (no-std)  
-│  
-└── **Short-lived/throwaway?**  
-    ├── **Needs libraries/REPL?**  
-    │   ├── Data science/ML? → **Python**/**Julia**/**R**  
-    │   ├── Web scraping? → **Python** (BeautifulSoup)/**JavaScript** (Puppeteer)  
-    │   └── Prototyping? → **Python**/**TypeScript**/**Clojure**  
-    │  
-    └── **Simple glue code?**  
-        ├── Shell scripting? → **Bash**/**Zsh**  
-        ├── Config/automation? → **Lua** (Neovim)/**Starlark** (Bazel)  
-        └── Text processing? → **Perl**/**Awk**/**Python**
-
-
 *** Language Selection Decision Tree
+#BEGIN_EXPORT ascii
   ┌── Long-lived?  
   │   ├── Performance-critical?  
   │   │   ├── Systems programming (OS/kernel/drivers)? → /C/, /Rust/, /Zig/
@@ -189,8 +166,10 @@ Is the tool/project:
           ├── Shell scripting? → /Bash/, /Zsh/
           ├── Config/automation? → /Lua (Neovim)/, /Starlark (Bazel)/
           └── Text processing? → /Perl/, /Awk/, /Python/
+#END_EXPORT
 
 *** Special Cases & Hybrid Workflows
+#BEGIN_ASCII
   ┌── Web Development?  
   │   ├── Frontend → /TypeScript/, /Elm/, /PureScript/
   │   └── Backend → /Go/, /Rust (Actix)/, /Java (Spring)/
@@ -202,6 +181,22 @@ Is the tool/project:
   └── Metaprogramming?  
       ├── Macros? → /Rust/, /Lisp/, /Julia/
       └── Codegen? → /Nim/, /C++ (templates)/, /TypeScript (tsc)/
+#END_ASCII
+
+#BEGIN_SRC text
+  ┌── Web Development?  
+  │   ├── Frontend → /TypeScript/, /Elm/, /PureScript/
+  │   └── Backend → /Go/, /Rust (Actix)/, /Java (Spring)/
+  │  
+  ├── Concurrency-heavy?  
+  │   ├── Distributed systems? → /Erlang/, /Elixir/, /Go/
+  │   └── Parallel computing? → /Julia/, /C++ (TBB)/, /Java (ForkJoinPool)/
+  │  
+  └── Metaprogramming?  
+      ├── Macros? → /Rust/, /Lisp/, /Julia/
+      └── Codegen? → /Nim/, /C++ (templates)/, /TypeScript (tsc)/
+#END_SRC
+
 
 *** Key Annotations
 1. /Performance-critical/ :: 
