@@ -93,8 +93,8 @@ result = square 6
 -- Guards (like if-else chains)
 max :: Int -> Int -> Int
 max a b
-| a > b = a
-| otherwise = b
+  | a > b = a
+  | otherwise = b
 
 -- if then else
 absolute :: Int -> Int
