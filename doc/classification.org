@@ -1,0 +1,60 @@
+#+title: Types of Programming Languages
+#+author:
+#+date: 2025-04-06
+
+* Compiled languages
+
+** Those that compile to a single binary executable
+
+- Language/compiler agnostic
+  + A binary is just machine code (e.g., x86_64, ARM
+    instructions). The OS doesn’t care if it came from C, Rust, or
+    Haskell.
+- Self-contained execution
+  + Binaries embed everything needed to run (code, static data,
+    OS-specific metadata). No external compiler/interpreter is
+    required.
+- OS handles execution directly
+  + The OS loader reads the binary’s entry point (e.g., main’s
+    address) and starts execution.
+  + No file extension is needed because the OS checks the file header
+    (e.g., ELF on Linux, PE on Windows) to confirm it’s executable.
+- Require =main= (or equivalent): The OS needs a fixed entry point to
+  start executing the binary.
+  + The binary is a standalone executable, and the OS loader jumps
+    directly to the =main= function’s address.
+  + No compiler/interpreter needed at runtime: The binary contains
+    machine code the OS can run natively.
+- Binaries are OS-specific but self-contained.
+- Binaries are faster (no interpreter/JIT overhead.)
+- Binaries simplify deployment (no dependencies). No runtime setup.
+- Examples with compilers:
+  + C (=gcc=)
+  + C++ (=gcc=)
+  + Haskell (=ghc=)
+  + Rust (=rustc=)
+
+** JIT-compiled languages
+
+- No =main= (usually): Code is compiled at runtime, so execution
+  starts dynamically.
+  - The JIT compiler (e.g., Julia’s LLVM, Java’s JVM) manages
+    execution.
+  - Still requires a runtime: The OS runs the JIT compiler/runtime
+    (e.g., julia, java), which then compiles/executes the code.
+- Examples with compiler/runtime environments:
+  + Java (JVM): Requires =main= for executables, but the JVM (not the
+    OS) calls it.
+  + Julia 
+    
+* Intepreted languages
+
+- No =main= function required: The interpreter executes the script
+  line-by-line.
+  + The interpreter (e.g., python, bash) controls execution flow, not
+    the OS.
+  + Interpreter must be installed: The OS runs the interpreter, which
+    then runs the script.
+- Examples with file extensions:
+  + Bash (.sh)
+  + Python (.py)

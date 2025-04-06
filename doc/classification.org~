@@ -1,0 +1,13 @@
+Classification of programming languages
+=======================================
+
+Single binary executables:
+- Require main function (or equivalent): 
+- C
+- C++
+- Haskell
+- Rust
+
+Intepreted languages:
+- Bash
+- Python
