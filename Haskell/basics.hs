@@ -73,13 +73,20 @@ add x y = x + y
 -- Calling
 sum = add 2 4
 
+{-
+
+-> is right associative:
+Int -> Int -> Int = Int -> (Int -> Int) (currying)
+
+-}
+
 -- Pattern matching
 factorial :: Int -> Int
 factorial 0 = 1                       -- Base case
 factorial n = n * factorial (n-1)     -- Recursive case
 
 -- Lambda (Anonymous functions)
-square = \x -> x * x
+square = \x -> x*x
 result = square 6
 
 -- Control flow
@@ -176,6 +183,20 @@ sortedList = sort [3, 1, 2]  -- [1, 2, 3]
     this is required because do blocks handle imperative-style code (like I/O).
 -}
 
+main :: IO ()
+main = do
+  let x = 5
+  print x
+  -- One let covers all bindings until the next non-indented line
+  -- Indentation matters: Bindings must align vertically
+  -- The let block ends when a less-indented line appears 
+  let name = "Haskell"
+      style = "functional programming"
+      compiler = "ghc"
+  print name              -- will print with quotes
+  print style
+  putStrLn compile        -- will print without quotes
+
 -- Common functions
 -- show :: Show a => a -> String
 show 2.4                             -- to string
@@ -211,7 +232,98 @@ response "n"     = "No"
 response ('y':_) = "Starts with 'y'"
 response _       = "Invalid"           -- wildcard, matches anything
 
+-- A simple counting function
+-- Counts the number of evens in a list
+countEven :: [Int] -> Int
+countEven [] = 0
+countEven (x:xs) =  (if even x then 1 else 0) + countEven xs
 
+countEven [1, 2, 3, 4, 5, 6] -- 3
 
+-- Operator section
+square = (^2)
+print (square 4)     -- 16
 
-    
+{-
+Normal function               Lambda                 Operator section
+square x = x^2                square = \x -> x^2     square = (^2)
+
+Use normal function for
+- Named, reusable, documented logic, 
+- Preferred in public APIs/library code
+- Example: factorial n = product [1..n]
+
+Use lambda
+- One-off, throw-away, inline transformations
+- Higher-order functions (e.g., map, filter)
+- When the logic is too small to name
+- Example: filter (\x -> x > 0) [-1, 2, -4, 8]
+
+Use operator section
+- Ultra-short numeric operations
+- Point-free style pipelines
+- Example: map (^2) (take 5 [1..])
+
+All the following work; best choice depends on the context
+map (^2) [1..3]         -- Operator section
+map (\x -> x^2) [1..3]  -- Equivalent lambda
+let square x = x^2 in map square [1..3]  -- Named function
+-}
+
+-- otherwise is a predefined value equal to True in the Prelude (the standard library)
+otherwise :: Bool
+otherwise = True        -- defined in the Prelude
+
+-- Guards are Haskell's clean way to handle multi-branch conditions without nested if-else
+-- use otherwise in guards
+grade :: Int -> String
+grade score
+  | score >= 90 = "A"
+  | score >= 80 = "B"
+  | score >= 70 = "C"
+  | score >= 60 = "D"
+  | otherwise   = "F"   -- equivalent to else
+
+-- Why Not Use if-else-if?
+-- Haskell’s if requires an else and gets messy with nested logic:
+grade :: Int -> String
+grade score =
+  if score >= 90 then "A"
+  else if score >= 80 then "B"
+  else if score >= 70 then "C"
+  else if score >= 60 then "D"
+  else "F"
+
+-- Combining guards and pattern matching
+-- Pattern match + guards
+factorial :: Int -> Int
+factorial 0 = 1
+factorial n | n > 0     = n * factorial (n - 1)
+            | otherwise = error "Negative input"
+
+-- Tips to learn Haskell faster?
+-- Signature First: Always check the type signature to understand a function
+map :: (a -> b) -> [a] -> [b]  -- Takes a function and a list, returns new list
+
+-- In ghci, use :t to check type
+-- :t filter
+filter :: (a -> Bool) -> [a] -> [b]
+
+-- Haskell code is a pipeline of transformations (no "steps" like in imperative code)
+result = map (*2) (filter even [0..9])
+
+-- Imperative: "Do this, then that, then loop…"
+-- Haskell: "This is the result of transforming that input."
+
+{- Comparison with Rust
+
+Rust                   Haskell              Notes
+Iterator::filter/map   filter/map           Almost identical usage
+match                  Pattern matching     Haskell's more powerful (e.g. recursive destructuring)
+Result<T, E>           Either E T           Same idea (Ok <-> Right, Err <-> Left)
+Option<T>              Maybe T              Some <-> Just, None <-> Nothing
+Immutable by default   Always immutable     Haskell never allows mutation
+Closures (|x| x + 1)   Lambdas (x -> x + 1) Similar syntax
+
+-}
+
