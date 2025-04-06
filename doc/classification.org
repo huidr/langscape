@@ -58,3 +58,119 @@
 - Examples with file extensions:
   + Bash (.sh)
   + Python (.py)
+
+* Popular languages
+** Single Binary (AOT-Compiled)
+
+These languages compile directly to machine code and produce
+standalone executables.
+
+| Language | Compiler/Toolchain             | Notes                                                     |
+|----------+--------------------------------+-----------------------------------------------------------|
+| C        | GCC, Clang, MSVC               | Classic AOT compilation                                   |
+| C++      | GCC, Clang, MSVC               | Similar to C, with OOP/metaprogramming                    |
+| Go       | go build (GC compiler)         | Statically linked binaries by default                     |
+| Haskell  | GHC (Glasgow Haskell Compiler) | Compiles to native code (via C--/LLVM) or bytecode (GHCi) |
+| Nim      | Nim compiler (C/JS backends)   | Can compile to C, then to binary                          |
+| Rust     | rustc (LLVM-based)             | Comiles to native code with no runtime                    |
+| Swift    | swifttc (LLVM-based)           | AOT for apps, JIT in playgrounds                          |
+| Zig      | zig build-exe                  | AOT-compiled, ships with cross-compilation support        |
+
+** JIT-compiled
+
+These languages compile to intermediate code, which is then
+JIT-compiled at runtime.
+
+| Language      | Runtime/JIT Engine                  | Notes                                               |
+|---------------+-------------------------------------+-----------------------------------------------------|
+| C#            | .NET CLR (RyūJIT)                   | JIT by default, AOT via .NET Native/ReadyToRun      |
+| Java          | JVM (HotSpot, OpenJG)               | Starts as interpreted bytecode, then JITs hot code  |
+| JavaScript    | V8 (Chrome), SpiderMonkey (Firefox) | Modern engines use tiered JIT (Ignition → TurboFan) |
+| Julia         | Julia VM (LLVM JIT)                 | Compiles functions on first call                    |
+| Lua (LuaJIT)  | LuaJIT                              | Extremely fast tracing JIT                          |
+| Python (PyPy) | PyPy (RPython JIT)                  | Alternative to CPython with JIT optimizations       |
+| R (FastR)     | GraalVM                             | Alternative R implementation with JIT               |
+
+** Runtime Environment (Bytecode + VM)
+
+These languages compile to bytecode, which is executed by a virtual
+machine (not strictly JIT).
+
+| Language    | Runtime/VM              | Notes                                                    |
+|-------------+-------------------------+----------------------------------------------------------|
+| Clojure     | JVM                     | Runs on JVM as bytecode                                  |
+| Erlang      | BEAM VM                 | Bytecode interpreted/JIT-optimized (HiPE)                |
+| Kotlin      | JVM                     | Compiles to JVM bytecode (can also compile to JS/Native) |
+| Scala       | JVM                     | Hybrid OOP/FP on JVM                                     |
+| WebAssembly | WASM runtimes (wasmtime | Portable bytecode for browsers/servers                   |
+
+** Intepreted (no compilation)
+
+These languages are executed line-by-line by an interpreter.
+
+| Language     | Interpreter                  | Notes                                                  |
+|--------------+------------------------------+--------------------------------------------------------|
+| Python       | Cpython                      | Reference implementation (not JIT by default)          |
+| Ruby         | MRI (Matz's Ruby Interpreter | Pure interpreter (JIT options via MJIT/TruffleRuby)    |
+| Bash         | GNU Bash                     | Shell scripting language                               |
+| R (GNU R)    | R interpreter                | Classic R implementation (no JIT)                      |
+| Perl         | perl                         | Interpreted (JIT via rperl experimental)               |
+| PHP          | Zend Engine                  | Traditionally interpreted (JIT in PHP 8+)              |
+| Lua (PUC)    | PUC-Lua                      | Reference interpreter (no JIT)                         |
+| Emacs Lisp   | Emacs                        | Interpreted (byte-compiled for speed)                  |
+| Common Lisp  | SBCL, CLISP                  | Can be interpreted or compiled (AOT/JIT in some impls) |
+| TypeScript   | tsc (compiles to JS)         | TS is transpiled to JS, then interpreted/JITed         |
+| CoffeeScript | coffee (compiles to JS)      | TS is transpiled to JS, then interpreted/JITed         |
+
+** Special languages
+
+| Language    | Classification               | Notes                                                      |
+|-------------+------------------------------+------------------------------------------------------------|
+| Assembly    | Machine code (via assembler) | Directly translated to binary (no abstraction)             |
+| WebAssembly | Binary + JIT (in browsers)   | AOT-compiled to WASM, then JITed by browser engines        |
+| Haskell     | Both AOT and interpreted     | GHC compiles to binary, but GHCi is interactive (bytecode) |
+| Nim         | AOT or JS                    | Can compile to C (binary) or JavaScript                    |
+
+* Which language to choose?
+
+** Quick guide
+
+- Single Binary (AOT): Best for performance/deployment (C, Rust, Go)
+- JIT: Balances speed and flexibility (Java, C#, Julia, JS)
+- Runtime/VM: Portable bytecode (JVM, BEAM, WASM).
+- Interpreted: Fast development, slower execution (Python, Bash).
+
+** Language selection decision tree
+
+Is the tool/project:
+├── **Long-lived?**  
+│   ├── **Performance-critical?**  
+│   │   ├── Systems programming (OS/kernel/drivers)? → **C**/**Rust**/**Zig**  
+│   │   ├── High-throughput servers? → **Rust**/**Go**/**Java** (JIT)  
+│   │   └── Numeric/scientific computing? → **Rust**/**Julia**/**C++**  
+│   │  
+│   └── **Needs easy distribution?**  
+│       ├── Cross-platform GUI? → **Rust** (Tauri)/**C#** (Avalonia)/**Kotlin** (Compose)  
+│       ├── CLI tool? → **Go** (static binary)/**Rust** (clap)/**OCaml**  
+│       └── Embedded? → **C**/**Rust**/**Zig** (no-std)  
+│  
+└── **Short-lived/throwaway?**  
+    ├── **Needs libraries/REPL?**  
+    │   ├── Data science/ML? → **Python**/**Julia**/**R**  
+    │   ├── Web scraping? → **Python** (BeautifulSoup)/**JavaScript** (Puppeteer)  
+    │   └── Prototyping? → **Python**/**TypeScript**/**Clojure**  
+    │  
+    └── **Simple glue code?**  
+        ├── Shell scripting? → **Bash**/**Zsh**  
+        ├── Config/automation? → **Lua** (Neovim)/**Starlark** (Bazel)  
+        └── Text processing? → **Perl**/**Awk**/**Python**  
+
+Is the tool: 
+├── Long-lived? 
+│   ├── Performance-critical? → Rust/Go/C
+│   └── Needs easy distribution? → Go/Rust
+└── Short-lived/throwaway? 
+    ├── Needs libraries/REPL? → Python/Julia
+    └── Simple glue code? → Bash
+
+ 
