@@ -268,3 +268,7 @@ if let Coin::Quarter(state) = coin {
 //      to extract and use those values, depending on how many cases
 //                                                you need to handle.
 
+// -----------------------------------------------------------------------
+// More pattern matching
+// -----------------------------------------------------------------------
+
