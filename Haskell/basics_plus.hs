@@ -95,3 +95,15 @@ length' xs = sum [1 | _ <- xs] -- underscore _ means we don't care what we draw 
 -- recall: strings are lists
 -- so, string comprehensions possible!
 
+-- tuples can be heterogenous
+-- the number of elements in a tuple is a part of its type
+-- tuples of the same type can be compared
+-- can't compare tuples of different sizes but they are of different type
+-- a pair is a tuple of size 2
+fst (1,2) -- returns 1 (first)
+snd (1,2) -- returns 2 (second)
+
+-- zip takes two lists and produce a list of pairs
+zip [1..3] ["One", "Two", "Three"] -- [(1,"One"),(2,"Two"),(3,"Three")]
+zip [1..8] ["One", "Two", "Three"] -- [(1,"One"),(2,"Two"),(3,"Three")] -- ignores the rest of the longer list
+zip [1..] ["Rust", "Haskell", "C", "Lisp"]
