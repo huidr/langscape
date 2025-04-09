@@ -149,6 +149,12 @@ let animals: Vec<Box<dyn Animal>> = vec![
     Box::new(Cat),  // Different types, same interface
 ];
 
+// no need to unwrap Box<dyn Animal>
+// trait object dyn Animal dispatches to the correct method at runtime
+for animal in animals {
+    animal.speak();
+}
+
 // How it works:
 // Box<dyn Animal> stores:
 //         A pointer to the actual data (Dog or Cat),
@@ -162,4 +168,59 @@ let animals: Vec<Box<dyn Animal>> = vec![
 //         Uses a vtable (virtual method table) at runtime to look up the correct method,
 //         Slightly slower (indirection cost), but flexible.
 
-// 
+// Use Box<dyn Trait> for heterogenous collections
+
+// Alternatives to Box<dyn Trait>
+// Approach	Pros                            Cons
+// impl Trait	Zero-cost, no heap allocation	Less flexible (compile-time)
+// &dyn Trait	No allocation, borrows data	Lifetime management harder
+// Enums	Faster, no heap	                Must know all variants upfront
+
+//              &dyn Trait              vs             Box<dyn Trait>
+// Ownership	Borrows data (reference)               Owns data (heap-allocated)
+// Lifetimes	Requires explicit lifetime management  No lifetime constraints (owned)
+// Storage	Stack or existing heap allocation      Always heap-allocated
+// Performance	Slightly faster (no alloc/dealloc)     Slower (heap allocation overhead)
+// Use Case	Short-lived polymorphism	       Long-lived or owned trait objects
+
+// Prefer &dyn Trait when
+// 1. You have existing data and only need temporary polymorphism
+// 2. Avoiding heap allocations (performance-critical code)
+// 3. Working with borrowed data from a function
+
+// use of (1): have existing data and only need temporary polymorphism
+struct Bird;
+impl Greet for Bird {}                 // default implementation
+
+let bird = Bird;
+let greeter: &dyn Greet = &bird;
+
+// Prefer Box<dyn Trait> when
+// 1. You need ownership (e.g., storing trait objects in a collection)
+// 2. Returning trait objects from functions
+// 3. Dynamic plugin systems where types are unknown at compile time
+
+// Performance implications
+// &dyn trait: No allocation overhead,
+//             slightly faster dynamic dispatch (one less pointer indirection)
+// Box<dyn trait>: Heap allocation cost (~15-30ns per Box),
+//                 extra indirection (accessing data via the heap).
+
+// Lifetime considerations
+// &dyn trait requires lifetimes to ensure the borrowed data outlives the trait object
+fn get_greeter<'a>(creature: &'a impl Greet) -> &'a dyn Greet {
+    shape                   // Trait object tied to shape's lifetime
+}
+
+// Box<dyn Trait> owns its data, so no lifetime annotations are needed
+fn get_greeter() -> Box<dyn Greet> {
+    Box::new(Bird)          // Owned, no lifetimes
+}
+
+// -----------------------------------------------------------------------
+
+// Alternatives to trait objects
+
+// Scenario                         Better alternative
+// All types known upfront          enum (faster, no heap)
+// Static dispatch                  impl trait (zero-cost)
