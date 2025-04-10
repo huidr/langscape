@@ -55,6 +55,7 @@ enum Message {
 struct QuitMessage;                 // unit struct
 struct MoveMessage {
     x: i32,
+
     y: i32
 }
 struct WriteMessage(String);                 // tuple struct
@@ -271,4 +272,75 @@ if let Coin::Quarter(state) = coin {
 // -----------------------------------------------------------------------
 // More pattern matching
 // -----------------------------------------------------------------------
+
+// All the places patterns can be used
+// 
+// match arms
+match VALUE {
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+}
+
+// you can mix if let, else if, else if let expressions
+// see the example below (taken from the book)
+fn main() {
+    let favorite_color: Option<&str> = None;
+    let is_tuesday = false;
+    let age: Result<u8, _> = "34".parse();
+
+    if let Some(color) = favorite_color {
+        println!("Using your favorite color, {color}, as the background");
+    } else if is_tuesday {
+        println!("Tuesday is green day!");
+    } else if let Ok(age) = age {
+        if age > 30 {
+            println!("Using purple as the background color");
+        } else {
+            println!("Using orange as the background color");
+        }
+    } else {
+        println!("Using blue as the background color");
+    }
+}
+
+// while let conditional loops
+// allows a while loop to run for as long as a pattern continues to match
+// see the example below (taken from the book)
+let (tx, rx) = std::sync::mpsc::channel();
+std::thread::spawn(move || {
+    for val in [1, 2, 3] {
+        ux.send(val).unwrap();
+    }
+});
+
+while let Ok(value) = rx.recv() {
+    println!("{value}");
+}
+
+// for loops
+// the value that directly follows the keyword for is a pattern
+// see the example below (taken from the book)
+
+let v = vec!['a', 'b', 'c'];
+
+for (index, value) in v.iter().enumerate() {
+    println!("{value} is at index {index}");
+}
+
+// formally, a let statement looks like this
+let PATTERN = EXPRESSION;
+
+// so good for destructuring structs, tuples, etc.
+let (x, y, z) = (2, 3, 4);
+
+// function parameters
+fn foo(&(x,y): &(i32, i32)) {
+    // --snip--
+}
+
+fn main() {
+    let point = (1, 2);
+    foo(&point);
+}
+
 
