@@ -343,4 +343,139 @@ fn main() {
     foo(&point);
 }
 
+// Ways of matching patterns
+// named variables
+match x {
+    Some (50) => println!("50"),
+    Some (k) => println!("{}", k),
+    _ => (),
+}
+
+// multiple patterns
+match x {
+    1 | 2 => println!("Either one or two"),
+    _ => (),
+}
+
+// matching ranges with ..=
+match x {
+    1..=5 => println!("Between 1 and 5 (inclusive)"),
+    _ => (),
+}
+
+match y {
+    'a'..='z' => println!("Lowercase"),
+    _ => println!("Not lowercase"),
+}
+
+// destructuring
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+let p = Point { x: 1, y: 2 };
+
+let Point { a, b } = p; // let Point { x: a, x: b } = p
+assert_eq!(1, a);
+assert_eq!(2, b);
+
+// the following is cool
+match p {
+    Point { x, y: 0 } => println!("On x-axis at {x}"),
+    Point { x: 0, y } => println!("On y-axis at {y}"),
+    Point { x, y } => println!("On neither axist, at {}", (x,y)),
+}
+
+// even cooler
+enum Color {
+    Rgb(i32, i32, i32),
+    Hsv(i32, i32, i32),
+}
+
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(Color),
+}
+
+fn main() {
+    let msg = Message::ChangeColor(Color::Rgb(0, 24, 72));
+
+    match msg {
+        Message::ChangeColor(Color::Rgb(x, y, z)) => 
+            println!("The rgb values are: {x}, {y}, {z}"),
+        Move { x, _ } =>
+            println!("The value of x is {x}"),
+        _ => 
+            println!("Don't care"),
+    }
+}
+
+// more destructuring
+let p = Point { x : 12, y : 14 }
+let ((feet, inches), Point { a, b }) = ((5, 11), p);
+
+// ignore values with _
+fn foo(_: i32, y: i32) {
+    println!("Only uses y parameter: {y}");
+}
+
+fn main() {
+    foo(3, 4);
+}
+
+// ignore parts of a value with a nested _
+let one = Some(1);
+let two = Some(2);
+
+match (one, two) {
+    (Some(_), Some(_)) => println!("Yo"),
+}
+
+let numbers = (1, 2, 3, 4, 5);
+
+match numbers {
+    (x, _, y, _, z) => 
+        println!("The first, third and fifth are {x}, {y}, {z}"),
+    _ => (),
+}
+
+// ignoring remaining parts of a value with ..
+struct Point { x: i32, y: i32, z: i32 }
+let origin = Point { x: 0, y: 0, z: 0 }
+
+match origin {
+    Point { x, .. } => println!("The x is {x}"),
+}
+
+// this would also work (must be unambiguous)
+match origin {
+    Point { x, .., z } => println!("The first and last are {x} and {z}"),
+}
+
+// extra conditionals with match guards
+let num = Some(4);
+
+match num {
+    Some(k) if x % 2 == 0 => println!("The number {k} is even."),
+    Some(k) => println!("The number {k} is odd."),
+    None => (),
+}
+
+let x = 4;
+let y = false;
+
+match x {
+    4 | 5 | 6 if y => println!("yes"),
+    _ => (),
+}
+
+
+
+
+
+
+
 
