@@ -224,3 +224,4 @@ fn get_greeter() -> Box<dyn Greet> {
 // Scenario                         Better alternative
 // All types known upfront          enum (faster, no heap)
 // Static dispatch                  impl trait (zero-cost)
+

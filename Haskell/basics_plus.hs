@@ -1,5 +1,4 @@
--- Still basics but a bit more
--- Based on "Learn You a Haskell for Great Good!"
+-- Based on Learn you a Haskell for great good
 
 -- In ghci, you use :l lib to load a Haskell file lib.hs in the same directory
 
@@ -107,3 +106,69 @@ snd (1,2) -- returns 2 (second)
 zip [1..3] ["One", "Two", "Three"] -- [(1,"One"),(2,"Two"),(3,"Three")]
 zip [1..8] ["One", "Two", "Three"] -- [(1,"One"),(2,"Two"),(3,"Three")] -- ignores the rest of the longer list
 zip [1..] ["Rust", "Haskell", "C", "Lisp"]
+
+-- typeclasses
+-- where keyword
+density :: (RealFloat a) => a -> a -> String
+density mass volume
+    | density < air = "Ride in the sky"
+    | density <= water = "Float"
+    | otherwise = "Sink"
+    where density = mass / volume
+          air = 1.2
+          water = 1000.0
+
+calcDensities :: (RealFloat a) => [(a, a)] -> [a]  
+calcDensities xs = [density m v | (m, v) <- xs]
+    where density mass volume = mass / volume  
+
+-- let   in
+var = let (x, y) = (2, 3) in x + y        -- var = 5
+
+let x = 1; y = 2; z = 3 in x + y + z      -- 6
+
+cylinder :: (RealFloat a) => a -> a -> a  
+cylinder radius height =
+    let sideArea = 2 * pi * r * h
+        topArea = pi * r^2
+    in  sideArea + 2 * topArea
+
+-- case
+case expression of pattern -> result  
+                   pattern -> result  
+                   pattern -> result  
+
+-- example
+head' :: [a] -> a
+head' xs = case xs of [] -> error "Empty"
+                      (x:_) -> x
+
+length' :: [a] -> Int
+length' xs = case xs of [] -> 0
+                        (x:y) -> 1 + length' y
+
+-- recursion
+replicate' :: (Integral i) => i -> a -> [a]
+replicate' n x
+    | n <= 0 = []
+    | n == 1 = [x]
+    | otherwise = x: replicate' (n-1) x
+
+replicate' 4 2 -- [2, 2, 2, 2]
+
+reverse' :: [a] -> [a]
+reverse' [] = []
+reverse' (x:xs) = xs ++ [x]
+
+reverse' [2, 4, 3, 1] -- [1, 3, 4, 2]
+
+quicksort' :: (Ord a) => [a] -> [a]
+quicksort' [] = []
+quicksort' (x:xs) =
+    let firstHalf = quicksort' [ a | a <- xs, a <= x ]
+        secondHalf = quicksort' [ a | a <- xs, a > x ]
+    in  firstHalf ++ [x] ++ secondHalf
+
+quicksort' [3, 4, 8, 2, 1, 5] -- [1, 2, 3, 4, 5, 8]
+
+-- Higher order functions: those that take functions as arguments or return them
