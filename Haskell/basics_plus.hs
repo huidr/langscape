@@ -256,3 +256,18 @@ module Geometry.Cube
 
 -- to import
 import Geometry.Cube
+
+-- types
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float | Square Float Float Float -- like enum
+
+:t Circle -- Circle :: Float Float Float -> Shape
+:t Rectangle -- Rectangle :: Float -> Float -> Float -> Float -> Shape
+:t Square -- Square :: Float -> Float -> Float -> Shape
+
+area (Circle _ _ radius) = pi * radius ^2
+area (Rectangle _ _ len wdth) = len * wdth
+area (Square _ _ side) = side ^2
+
+:t area -- area :: Shape -> Float
+
+area (Circle 1 2 4) -- 
