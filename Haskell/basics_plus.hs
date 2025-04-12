@@ -1,4 +1,3 @@
--- basics_pro.hs 
 -- Based on Learn you a Haskell for great good
 
 -- In ghci, you use :l lib to load a Haskell file lib.hs in the same directory
@@ -257,12 +256,23 @@ module Geometry.Cube
 -- to import
 import Geometry.Cube
 
--- types
+-- types -----------------------------------------------------------------
 data Shape = Circle Float Float Float | Rectangle Float Float Float Float | Square Float Float Float -- like enum
 
 :t Circle -- Circle :: Float Float Float -> Shape
 :t Rectangle -- Rectangle :: Float -> Float -> Float -> Float -> Shape
 :t Square -- Square :: Float -> Float -> Float -> Shape
+
+-- accessor functions
+radius :: Shape -> Float
+radius (Circle _ _ r) = r
+radius (Rectangle _ _ _ _) = error "It's a rectangle!"
+radius (Square _ _ _) = error "It's a square!"
+
+sideLength :: Shape -> Float
+sideLength (Square _ _ s) = s
+sideLength (Circle _ _ _) = error "It's a circle!"
+sideLength (Rectangle _ _ _ _) = error "It's a rectangle!"
 
 area (Circle _ _ radius) = pi * radius ^2
 area (Rectangle _ _ len wdth) = len * wdth
@@ -270,4 +280,72 @@ area (Square _ _ side) = side ^2
 
 :t area -- area :: Shape -> Float
 
-area (Circle 1 2 4) -- 
+area (Circle 1 2 3) -- 28.274334 (area of circle with center (1,2) and radius 3
+area (Rectangle 1 2 3 4) -- 12
+area (Square 1 2 3) -- 9
+
+-- types deriving (like Rust's derive trait)
+-- Shape is a type
+-- Circle, Rectangle, Square are constructors
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float | Square Float Float Float deriving (Show, Eq)
+-- Show is to convert to string
+-- Eq to check equality == or /=
+
+let cir1 = Circle 0 0 1
+let cir2 = Circle 0 0 2
+let cir' = Circle 0 0 1
+
+show cir1 -- "Circle 0.0 0.0 1.0"
+show cir2 -- "Circle 0.0 0.0 2.0"
+show cir' -- "Circle 0.0 0.0 1.0"
+
+cir1 == cir2 -- False
+cir1 == cir' -- True
+cir1 /= cir2 -- True
+
+radius cir1 -- 1.0 (using accessor function we defined above)
+
+-- make something like struct
+data Person = Person { name :: String, age :: Int } deriving (Show, Eq)
+
+let p = Person { name = "Haskell", age = 24 }
+let q = Person { name = "Rust", age = 17 }
+let r = Person { name = "Haskell", age = 24 }
+
+show p -- "Person {name = \"Haskell\", age = 24 }"
+
+p == q -- False
+p == r -- True
+
+-- accessor functions (automatically available for record-based data (like struct)
+name p -- "Haskell"
+age p -- 24
+
+-- Maybe ----------------------------------------------------------------
+-- data Maybe a = Nothing | Just a
+divide' :: Float -> Float -> Maybe Float
+divide' x y
+    | y == 0 = Nothing
+    | otherwise = Just $ x / y
+
+print $ divide' 3 2 -- 1.5
+
+-- Typeclasses are like traits of Rust or interfaces of Java
+-- we implement them using "deriving" keyword
+data Day = Sun | Mon | Tue | Wed | Thu | Fri | Sat
+     deriving (Eq, Ord, Bounded, Enum, Show, Read)
+
+putStrLn $ show Fri -- because implemented Show for Day
+read "Wed" :: Day -- returns a value of Day type (having value Wed)
+Mon == Fri -- False
+Wed > Thu -- False (we implemented Ord)
+minBound :: Day -- Sun (we implemented Bounded)
+maxBound :: Day -- Sat
+succ Sun -- Mon (successor, because we implemented Enum)
+pred Sat -- Fri (predecessor)
+
+-- type synonyms
+-- [Char] and String are equivalent (that was implemented with type synonyms)
+type String = [Char]
+
+
