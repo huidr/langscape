@@ -322,7 +322,8 @@ name p -- "Haskell"
 age p -- 24
 
 -- Maybe ----------------------------------------------------------------
--- data Maybe a = Nothing | Just a
+data Maybe a = Nothing | Just a
+-- It's like Rust's Option<T>
 divide' :: Float -> Float -> Maybe Float
 divide' x y
     | y == 0 = Nothing
@@ -346,6 +347,59 @@ pred Sat -- Fri (predecessor)
 
 -- type synonyms
 -- [Char] and String are equivalent (that was implemented with type synonyms)
-type String = [Char]
+-- like C++'s typedef
+type String = [Char] -- so, String can be used instead of [Char] in declarations like...
+rev' :: String -> String -- instead of rev' :: [Char] -> [Char]
 
+-- Either ----------------------------------------------------------------
+data Either a b = Left a | Right b deriving (Eq, Ord, Read, Show)
+-- It's like Rust's Result<T, E>
 
+safeDivide :: Float -> Float -> Either String Float
+safeDivide _ 0 = Left "Denominator zero"
+safeDivide x y = Right (x / y)
+
+-- can be used like this
+val = case safeDivide 4 3 of
+    Left msg -> "Error: " ++ msg
+    Right value -> "Value: " ++ show value
+
+putStrLn val
+
+-- or do pattern matching
+describeResult :: Either String Float -> String
+describeResult (Left msg) = "Error: " ++ msg
+describeResult (Right value) = "Value: " ++ show value
+
+putStrLn $ describeResult $ safeDivide 4 0
+
+-- interoperability
+-- convert Either to Maybe
+eitherToMaybe :: Either a b -> Maybe b
+eitherToMaybe (Left _) = Nothing
+eitherToMaybe (Right x) = Just x
+
+print $ eitherToMaybe $ safeDivide 7.2 0.0
+
+-- recursive data structures ---------------------------------------------
+-- binary search tree (BST)
+data BST a = Empty      -- base case
+           | Node a (BST a) (BST a)  -- a node contains a value of type 'a' and two sub trees
+
+-- in the above, a is a type, could be Int, String, etc.
+
+-- insert a value into the BST
+insert :: (Ord a) => a -> BST a -> BST a -- Ord means comparable <, >, ==, etc.
+insert x Empty = Node x Empty Empty -- Insert into an empty tree
+insert x (Node y left right)
+    | x == y = Node y left right -- value already exists, do nothing
+    | x < y = Node y (insert x left) right -- recurse into the left subtree
+    | x > y = Node y left (insert x right)
+
+-- search for an element
+search :: (Ord a) => a -> BST a -> Bool
+search _ Empty = False
+search x (Node y left right)
+    | x == y = True
+    | x < y  = search x left
+    | x > y  = search x right
