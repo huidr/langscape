@@ -1,3 +1,4 @@
+-- basics_pro.hs 
 -- Based on Learn you a Haskell for great good
 
 -- In ghci, you use :l lib to load a Haskell file lib.hs in the same directory
@@ -172,3 +173,86 @@ quicksort' (x:xs) =
 quicksort' [3, 4, 8, 2, 1, 5] -- [1, 2, 3, 4, 5, 8]
 
 -- Higher order functions: those that take functions as arguments or return them
+-- curried functions
+-- lambda functions
+-- partial evaluation
+divideBy10 :: Fractional a => a -> a
+divideBy10 = (/10)
+divideBy10 23      -- 2.3
+
+add :: Num a => a -> a -> a
+add' x y = x + y
+
+-- on ghci
+:t (add 3)         -- (add 3) :: Num a => a -> a
+                   -- (add 3) = \x -> x + 3
+
+isUpperAlpha :: Char -> Bool
+isUpperAlpha = (`elem` ['A'..'Z'])
+
+isUpperAlpha 'c'    -- False
+isUpperAlpha 'F'    -- True
+
+-- maps and filters
+map (^2) [1..5]    -- [1, 4, 9, 16, 25]
+filter (>7) [1..9] -- [8, 9]
+
+-- lambdas
+func = \x -> x^2 + 1
+:t func                 -- func :: Num a => a -> a
+
+func 5                  -- 26
+map func [1..5]         -- [2, 5, 10, 17, 26]
+map (\x -> x^2 + 1) [1..5]     -- same as above
+map (+1) (map (^2) [1..5])     -- same as above
+map (+1) $ map (^2) [1..5]     -- same as above
+
+map (\(x,y) -> x + y) [(1,2),(3,4),(5,6)]    -- [3,7,11]
+
+add' = \x -> \y -> \z -> x + y + z -- add' x y z = x + y + z
+:t add' -- add' :: Num a => a -> a -> a -> a
+
+-- folds
+-- foldl (from left)
+-- foldr (from right)
+sum' :: (Num a) => [a] -> a
+sum' xs = foldl (\acc x -> acc + x) 0 xs
+
+-- the following are equivalent forms of writing the above function
+sum' = foldl (\acc x -> acc + x) 0 -- removing xs from both sides
+sum' = foldl (+) 0                 -- where (+) is the binary function: \acc x -> acc + x
+
+sum' [1..100] -- 5050
+
+-- scanl, scanr works like foldl, foldr except they report all the intermediate accumulator states in the form of a list.
+
+-- using $
+-- f $ x = f x      (definition of $)
+-- why use $? because it is right associative and can reduce usage of parenthesis
+-- f ( g (h x)) can be written as f $ g $ h x
+
+-- function composition can be written using dot
+fn = tan . cos . max 3      -- fn x = tan (cos (max 3 x))
+
+-- modules
+import System.Environment (getArgs)           -- only getArgs defined in System.Environment
+import Data.List                              -- everything in Data.List
+import Data.List hiding (num, sort)           -- all except num and sort
+import qualified Data.Map as M                -- to resolve name conflicts, use M as an alias for Data.Map
+
+-- declare a module (a file in the same directory as the main.hs)
+module Geometry            -- at the top of Geometry.hs
+  ( sphereVolume           -- list of functions defined in Geometry.hs which you want to be exported
+  , sphereArea
+  , cuboidVolume
+  , cuboidArea
+  ) where
+
+-- suppose you have Geometry/Cube.hs, and the directory Geometry is in the same directory as main.hs
+module Geometry.Cube
+  ( cubeVolume
+  , cubeArea
+  ) where
+
+-- to import
+import Geometry.Cube
