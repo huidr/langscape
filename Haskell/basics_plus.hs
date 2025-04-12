@@ -403,3 +403,37 @@ search x (Node y left right)
     | x == y = True
     | x < y  = search x left
     | x > y  = search x right
+
+-- defining our own typeclasses
+
+-- the following is how typeclass Eq is defined in the standard Prelude
+class Eq a where                 -- a is the type variable (like Int)
+  (==) :: a -> a -> Bool
+  (/=) :: a -> a -> Bool
+  x == y = not (x /= y)
+  x /= y = not (x == y)
+
+-- in the above, Eq is a typeclass
+-- a could have been more than a letter, as long as it is a lowercase word
+-- any type deriving Eq will have two functions (==) and (/=)
+
+-- In Rust we write
+{-
+    trait Describable {
+        fn describe(&self) -> String;
+    }
+-}
+-- In Haskell we write
+class Describable a where
+    describe :: a -> String
+
+-- a custom type
+data Pet = Cat | Dog deriving (Show)
+
+-- make Pet an instance of our Describable class
+instance Describable Pet where
+    describe Cat = "I am a cat"
+    describe Dog = "I am a dog"
+
+putStrLn $ describe Cat -- I am a cat
+putStrLn $ describe Dog -- I am a dog
