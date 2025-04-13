@@ -453,3 +453,55 @@ data Box a = Box a
 instance Functor Box where
   fmap f (Box x) = Box (f x)
 
+-- IO: Output
+let var = 12
+print var
+putStrLln $ show var
+
+main :: IO ()
+main = do
+  putStrLn "Give me an integer"
+  input <- getLine -- you don't use let keyword
+  putStrLn $ "You gave " ++ input
+  let value = read input :: Int -- will crash if a non-integer is entered
+  let lambda = \x -> x + value
+  print $ lambda 7
+
+-- the above code may crash if user inputs a non-integer
+import Text.Read (readMaybe)
+
+main :: IO()
+main = do
+  putStrLn "Give me an integer"
+  input <- getLine
+  case readMaybe input :: Maybe Int of
+    Just var -> putStrLn $ "You gave " ++ show var
+    Nothing -> putStrLn $ "You gave a non-integer"
+
+-- randomness
+import System.Random (randomRIO)
+
+main :: IO ()
+main = do
+  num <- randomRIO (1, 100) -- returns IO a, so use <- inside do block
+  print num
+
+-- look into bytestrings
+-- they are better and faster to work with large text files
+-- because they are not lazy like standard String aka [Char]
+
+import System.Environment
+import System.IO
+import System.Directory
+
+main :: IO ()
+main = do
+  (fileName:_) <- getArgs
+  fileExists <- doesFileExist fileName
+  if fileExists
+    then do
+    contents <- readFile fileName
+    putStrLn $ "The file has " ++ show (length (lines contents)) ++ " lines!"
+    else do
+    putStrLn "The file doesn't exist!"
+
