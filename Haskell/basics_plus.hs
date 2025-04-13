@@ -111,16 +111,16 @@ zip [1..] ["Rust", "Haskell", "C", "Lisp"]
 -- where keyword
 density :: (RealFloat a) => a -> a -> String
 density mass volume
-    | density < air = "Ride in the sky"
-    | density <= water = "Float"
-    | otherwise = "Sink"
-    where density = mass / volume
-          air = 1.2
-          water = 1000.0
+  | density < air = "Ride in the sky"
+  | density <= water = "Float"
+  | otherwise = "Sink"
+  where density = mass / volume
+        air = 1.2
+        water = 1000.0
 
 calcDensities :: (RealFloat a) => [(a, a)] -> [a]  
 calcDensities xs = [density m v | (m, v) <- xs]
-    where density mass volume = mass / volume  
+  where density mass volume = mass / volume  
 
 -- let   in
 var = let (x, y) = (2, 3) in x + y        -- var = 5
@@ -129,9 +129,9 @@ let x = 1; y = 2; z = 3 in x + y + z      -- 6
 
 cylinder :: (RealFloat a) => a -> a -> a  
 cylinder radius height =
-    let sideArea = 2 * pi * r * h
-        topArea = pi * r^2
-    in  sideArea + 2 * topArea
+  let sideArea = 2 * pi * r * h
+      topArea = pi * r^2
+  in  sideArea + 2 * topArea
 
 -- case
 case expression of pattern -> result  
@@ -150,9 +150,9 @@ length' xs = case xs of [] -> 0
 -- recursion
 replicate' :: (Integral i) => i -> a -> [a]
 replicate' n x
-    | n <= 0 = []
-    | n == 1 = [x]
-    | otherwise = x: replicate' (n-1) x
+  | n <= 0 = []
+  | n == 1 = [x]
+  | otherwise = x: replicate' (n-1) x
 
 replicate' 4 2 -- [2, 2, 2, 2]
 
@@ -165,9 +165,9 @@ reverse' [2, 4, 3, 1] -- [1, 3, 4, 2]
 quicksort' :: (Ord a) => [a] -> [a]
 quicksort' [] = []
 quicksort' (x:xs) =
-    let firstHalf = quicksort' [ a | a <- xs, a <= x ]
-        secondHalf = quicksort' [ a | a <- xs, a > x ]
-    in  firstHalf ++ [x] ++ secondHalf
+  let firstHalf = quicksort' [ a | a <- xs, a <= x ]
+      secondHalf = quicksort' [ a | a <- xs, a > x ]
+  in  firstHalf ++ [x] ++ secondHalf
 
 quicksort' [3, 4, 8, 2, 1, 5] -- [1, 2, 3, 4, 5, 8]
 
@@ -326,15 +326,15 @@ data Maybe a = Nothing | Just a
 -- It's like Rust's Option<T>
 divide' :: Float -> Float -> Maybe Float
 divide' x y
-    | y == 0 = Nothing
-    | otherwise = Just $ x / y
+  | y == 0 = Nothing
+  | otherwise = Just $ x / y
 
 print $ divide' 3 2 -- 1.5
 
 -- Typeclasses are like traits of Rust or interfaces of Java
 -- we implement them using "deriving" keyword
 data Day = Sun | Mon | Tue | Wed | Thu | Fri | Sat
-     deriving (Eq, Ord, Bounded, Enum, Show, Read)
+  deriving (Eq, Ord, Bounded, Enum, Show, Read)
 
 putStrLn $ show Fri -- because implemented Show for Day
 read "Wed" :: Day -- returns a value of Day type (having value Wed)
@@ -361,8 +361,8 @@ safeDivide x y = Right (x / y)
 
 -- can be used like this
 val = case safeDivide 4 3 of
-    Left msg -> "Error: " ++ msg
-    Right value -> "Value: " ++ show value
+  Left msg -> "Error: " ++ msg
+  Right value -> "Value: " ++ show value
 
 putStrLn val
 
@@ -392,17 +392,17 @@ data BST a = Empty      -- base case
 insert :: (Ord a) => a -> BST a -> BST a -- Ord means comparable <, >, ==, etc.
 insert x Empty = Node x Empty Empty -- Insert into an empty tree
 insert x (Node y left right)
-    | x == y = Node y left right -- value already exists, do nothing
-    | x < y = Node y (insert x left) right -- recurse into the left subtree
-    | x > y = Node y left (insert x right)
+  | x == y = Node y left right -- value already exists, do nothing
+  | x < y = Node y (insert x left) right -- recurse into the left subtree
+  | x > y = Node y left (insert x right)
 
 -- search for an element
 search :: (Ord a) => a -> BST a -> Bool
 search _ Empty = False
 search x (Node y left right)
-    | x == y = True
-    | x < y  = search x left
-    | x > y  = search x right
+  | x == y = True
+  | x < y  = search x left
+  | x > y  = search x right
 
 -- defining our own typeclasses
 
@@ -425,15 +425,31 @@ class Eq a where                 -- a is the type variable (like Int)
 -}
 -- In Haskell we write
 class Describable a where
-    describe :: a -> String
+  describe :: a -> String
 
 -- a custom type
 data Pet = Cat | Dog deriving (Show)
 
 -- make Pet an instance of our Describable class
 instance Describable Pet where
-    describe Cat = "I am a cat"
-    describe Dog = "I am a dog"
+  describe Cat = "I am a cat"
+  describe Dog = "I am a dog"
 
 putStrLn $ describe Cat -- I am a cat
 putStrLn $ describe Dog -- I am a dog
+
+-- functor is a typeclass that represents types that can be mappped over
+-- if a type can be used as a box that contains values, and you want to apply a function inside the box; that's where functor comes in
+class functor f where
+  fmap :: (a -> b) -> f a -> f b
+
+print $ fmap (*2) $ Just 6
+print $ fmap (^4) $ Just 13
+print $ fmap (+2) [1, 2, 3]
+
+-- define functor instance for a custom type
+data Box a = Box a
+
+instance Functor Box where
+  fmap f (Box x) = Box (f x)
+
