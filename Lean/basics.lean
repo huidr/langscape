@@ -274,10 +274,18 @@ def appendList (α : Type) (xs ys : PolyList α) : PolyList α :=
   | PolyList.nil => ys
   | PolyList.cons x xs' => PolyList.cons x (appendList α xs' ys)
 
-def reverseSlow (α : Type) (xs : PolyList α) : PolyList α :=
+def reverseSlow (α : Type) (xs : PolyList α) : PolyList α := -- O(n^2) time, since append traverses the list each time it is called
   match xs with
   | PolyList.nil => PolyList.nil
   | PolyList.cons y ys => append α y (reverseSlow α ys) 
 
--- The above reverseSlow can be improved to get O(n) time
+-- The above reverseSlow can be improved to get O(n) time by using an accumulator
+def reverseHelper (α : Type) (xs acc : PolyList α) : PolyList α :=
+  match xs with
+  | PolyList.nil => acc
+  | PolyList.cons y ys => reverseHelper α ys (PolyList.cons y acc)
 
+def reverse (α : Type) (xs : PolyList α) : PolyList α := -- this is O(n) time
+  reverseHelper α xs PolyList.nil
+
+-- Write filter and fold 
