@@ -70,12 +70,13 @@ def nine : NN := 9
 #check nine -- nine : NN
 #eval nine
 
--- Structures
+-- Structures ------------------------------------------------------------------------------
+
 structure Point where
   x : Float
   y : Float
 deriving Repr -- asks Lean to generate code to display values of type Point (used by #eval to render the result of evaluation)
-
+ 
 def origin : Point := { x := 0, y := 0}
 
 #check origin
@@ -128,4 +129,79 @@ def Point.modifyBoth : (Float → Float) → Point → Point := -- modifyBoth is
 def randomPoint : Point := { x := 7.1, y := -2.4 }
 #eval Point.modifyBoth Float.floor randomPoint -- Float.floor is the standard floor function
 #eval randomPoint.modifyBoth Float.floor -- equivalent to the above
+
+-- Datatypes and Patterns ---------------------------------------------------------------
+
+-- Product types (e.g. structure): group together a collection of values
+-- Sum types: allow choices (Rust's enum?)
+-- Recursive types: can include instances of themselves
+-- Inductive types: sum + recursive
+
+inductive NewBool where -- sum type
+  | newFalse : NewBool -- a constructor (the annotation may be omitted)
+  | newTrue -- another constructor
+
+#check NewBool.newTrue -- NewBool
+
+-- Let's do some Peano stuff
+inductive NaturalNumber where
+  | zero
+  | succ : NaturalNumber → NaturalNumber -- alternatively, succ (k : NaturalNumber) : NaturalNumber
+
+def one : NaturalNumber := NaturalNumber.succ NaturalNumber.zero
+#check one -- one : NaturalNumber
+#eval one -- NaturalNumber.succ NaturalNumber.zero
+
+def two : NaturalNumber := NaturalNumber.succ one
+#eval two -- NaturalNumber.succ (NaturalNumber.succ (NaturalNumber.zero))
+
+def three := NaturalNumber.succ two -- no annotation, type inference
+
+-- Some pattern matching demo ahead
+def isZero : NaturalNumber → Bool :=
+  λ n => match n with
+  | NaturalNumber.zero => true
+  | NaturalNumber.succ _ => false -- using _ as placeholder
+
+def pred : NaturalNumber → NaturalNumber :=
+  λ n => match n with
+  | NaturalNumber.zero => NaturalNumber.zero
+  | NaturalNumber.succ k => k
+
+def isEven : NaturalNumber → Bool := λ n => 
+  match n with
+  | NaturalNumber.zero => true
+  | NaturalNumber.succ k => not (isEven k)
+
+def isOdd (n : NaturalNumber) : Bool := ¬ (isEven n) -- not and ¬ are the same
+
+def plus (m n : NaturalNumber) : NaturalNumber :=
+  match n with
+  | NaturalNumber.zero => m
+  | NaturalNumber.succ k => NaturalNumber.succ (plus m k)
+
+def four := plus two two -- type inference
+def five := plus one four
+
+def minus (m n : NaturalNumber) : NaturalNumber :=
+  match n with
+  | NaturalNumber.zero => m
+  | NaturalNumber.succ k => pred (minus m k) -- because m-n = m-(k+1) = m-k-1 = pred(m-k)
+
+def multiply (m n : NaturalNumber) : NaturalNumber :=
+  match n with
+  | NaturalNumber.zero => NaturalNumber.zero
+  | NaturalNumber.succ k => plus m (multiply m k)
+
+-- Polymorphism ------------------------------------------------------------------------------
+
+structure PolyPoint (α : Type) where
+  xcoor : α
+  ycoor : α
+deriving Repr
+
+def polyOrigin : PolyPoint String := { xcoor := "Lean", ycoor := "Prover" }
+
+def xyConcat (p : PolyPoint String) : String := String.append p.xcoor p.ycoor
+def leanProver := xyConcat polyOrigin
 
