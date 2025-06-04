@@ -195,6 +195,8 @@ def multiply (m n : NaturalNumber) : NaturalNumber :=
 
 -- Polymorphism ------------------------------------------------------------------------------
 
+-- In functional programming, the term polymorphism typically refers to datatypes and definitions that take types as arguments
+
 structure PolyPoint (α : Type) where
   xcoor : α
   ycoor : α
@@ -204,4 +206,78 @@ def polyOrigin : PolyPoint String := { xcoor := "Lean", ycoor := "Prover" }
 
 def xyConcat (p : PolyPoint String) : String := String.append p.xcoor p.ycoor
 def leanProver := xyConcat polyOrigin
+
+-- Types are ordinary expressions in Lean, so passing arguments to polymorphic types requires no special syntax
+
+def replaceY (α : Type) (point : PolyPoint α) (newYcoor : α) : PolyPoint α :=
+  { point with ycoor := newYcoor }
+
+#check (replaceY) -- replaceY : (α : Type) → PolyPoint α → α → PolyPoint α
+
+-- Providing the first argument, Nat, causes all occurrences of α in the remainder of the type to be replaced with Nat (currying)
+#check (replaceY Nat) -- replaceY Nat : PolyPoint Nat → Nat → PolyPoint Nat
+
+def leanLang := xyConcat (replaceY String polyOrigin "Lang")
+
+inductive Sign where
+  | pos
+  | neg
+
+-- Types are first class and can be computed using the ordinary rules of the Lean language
+-- If the argument (Sign) is positive, the function returns a Nat, while if it's negative, it returns an Int:
+def posOrNegOne (s : Sign) : 
+    match s with
+    | Sign.pos => Nat
+    | Sign.neg => Int :=
+  match s with
+  | Sign.pos => 1
+  | Sign.neg => -1
+
+-- Another example (a feature of dependently typed languages, not directly possible in Haskell)
+def someFunction : (b : Bool) → (if b then Nat else String)
+  | true => (4 : Nat)
+  | false => "Four"
+
+-- In the above, (if b then Nat else String) is a dependent return type (since b depends on the input)
+
+-- Linked lists
+def someNats : List Nat := [1, 4, 7, 9]
+
+inductive PolyList (α : Type) where
+  | nil
+  | cons : α → PolyList α → PolyList α
+
+def someExplicitNats : PolyList Nat := PolyList.cons 1 (PolyList.cons 4 (PolyList.cons 7 (PolyList.cons 9 PolyList.nil)))
+
+-- Lean ensures termination of all recursive definitions by construction (structural recursion)
+def length (α : Type) (xs : PolyList α) : Nat := -- structural recursion on xs
+  match xs with
+  | PolyList.nil => 0
+  | PolyList.cons _ ys => 1 + length α ys -- recursive calls must be on subcomponents (subterms) of the original input
+
+#eval length Nat someExplicitNats -- 4
+
+def map (α : Type) (f : α → α ) (xs : PolyList α ) : PolyList α :=
+  match xs with
+  | PolyList.nil => PolyList.nil
+  | PolyList.cons y ys => PolyList.cons (f y) (map α f ys)
+
+#eval map Nat (λ x => x*x) someExplicitNats -- PolyList.cons 1 (PolyList.cons 16 (PolyList.cons 49 (PolyList.cons 81 (PolyList.nil))))
+
+def append (α : Type) (x : α) (xs : PolyList α) : PolyList α :=
+  match xs with
+  | PolyList.nil => PolyList.cons x PolyList.nil
+  | PolyList.cons y ys => PolyList.cons y (append α x ys)
+
+def appendList (α : Type) (xs ys : PolyList α) : PolyList α :=
+  match xs with
+  | PolyList.nil => ys
+  | PolyList.cons x xs' => PolyList.cons x (appendList α xs' ys)
+
+def reverseSlow (α : Type) (xs : PolyList α) : PolyList α :=
+  match xs with
+  | PolyList.nil => PolyList.nil
+  | PolyList.cons y ys => append α y (reverseSlow α ys) 
+
+-- The above reverseSlow can be improved to get O(n) time
 
