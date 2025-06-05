@@ -339,6 +339,26 @@ def List.newTail? {α : Type} (xs : List α) : Option (List α) :=
 #eval [2, 4, 7, 8].newHead?
 #eval List.newTail? [2, 4, 7, 8]
 
+I did some exercises from the official Lean book
+
+-- implementing last (like Haskell's)
+def List.last? {α : Type} (xs : List α) : Option α :=
+  match xs with
+  | [] => none
+  | [k] => some k
+  | _ :: ys => List.last? ys
+
+#eval [7, 10, 2, 4].last? -- some 4
+#eval List.last? [] (α := String) -- none
+
+-- finds the first entry in a list that satisfies a given predicate
+def List.findFirst? {α : Type} (xs : List α) (predicate : α → Bool) : Option α :=
+  match xs with
+  | [] => none
+  | y :: ys => if predicate y then some y else List.findFirst? ys predicate
+
+#eval List.findFirst? [2, 4, 7] (λ x => x ≠ 2)
+
 inductive MyOption (α : Type) where
   | myNone
   | mySome (k : α)
@@ -366,13 +386,40 @@ def fives : String × String × Int := ("V", "fives", 5)
 structure MyProd (α β : Type) where
   fst : α
   snd : β
+deriving Repr
 
 notation s " Π " t => MyProd s t 
 
-def newOnes : String Π Int := { fst := "oneeee", snd = "1111" }
-#eval newOnes
+def newOnes : String Π Int := { fst := "one", snd := 1 }
+
+-- switches the two fields in a pair for each other
+def Prod.switch {α β : Type} (pair : α × β) : β × α :=
+  { fst := pair.snd, snd := pair.fst }
 
 -- Sum types
+def PetName : Type := String ⊕ String -- α ⊕ β as notation for Sum α β
+def animals : List PetName := [ Sum.inl "Tom", Sum.inr "Jerry" ]
+
+inductive MySum (α β : Type) where
+  | inl : α → MySum α β -- inl stands for left injection
+  | inr : β → MySum α β -- inr stands for right injection
+deriving Repr
+
+notation s " Σ " t => MySum s t
+
+def myNum : String Σ Nat := MySum.inl "Five"
+def myNat : String Σ Nat := MySum.inr 5
+
+-- Exercise: build monadic-style functions like mapLeft, mapRight
+
+/- 
+-- Prod and Sum should be used either when writing very generic code,
+-- for a very small section of code where there is no sensible domain-specific type,
+-- or when the standard library contains useful functions.
+-- In most situations, it is more readable and maintainable to use a custom inductive type.
+-/
+
+
 
 
 
@@ -388,5 +435,3 @@ notation f " | " x => f x
 
 -- Lean also supports function composition through ∘ 
 #eval (String.length ∘ String.trim) "  function composer  "
-
-
