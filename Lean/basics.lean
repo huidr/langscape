@@ -243,6 +243,12 @@ def someFunction : (b : Bool) → (if b then Nat else String)
 -- Linked lists
 def someNats : List Nat := [1, 4, 7, 9]
 
+-- y :: ys is Lean equivalent of Haskell's y : ys 
+def myLength {α : Type} (xs : List α) : Nat :=
+  match xs with
+  | [] => 0
+  | _ :: ys => 1 + myLength ys
+
 inductive PolyList (α : Type) where
   | nil
   | cons : α → PolyList α → PolyList α
@@ -250,20 +256,17 @@ inductive PolyList (α : Type) where
 def someExplicitNats : PolyList Nat := PolyList.cons 1 (PolyList.cons 4 (PolyList.cons 7 (PolyList.cons 9 PolyList.nil)))
 
 -- Lean ensures termination of all recursive definitions by construction (structural recursion)
-def length (α : Type) (xs : PolyList α) : Nat := -- structural recursion on xs
+def length {α : Type} (xs : PolyList α) : Nat := -- structural recursion on xs
   match xs with
   | PolyList.nil => 0
-  | PolyList.cons _ ys => 1 + length α ys -- recursive calls must be on subcomponents (subterms) of the original input
+  | PolyList.cons _ ys => 1 + length ys -- recursive calls must be on subcomponents (subterms) of the original input
 
-#eval length Nat someExplicitNats -- 4
-
-def map (α : Type) (f : α → α ) (xs : PolyList α ) : PolyList α :=
+def map {α : Type} (f : α → α ) (xs : PolyList α ) : PolyList α :=
   match xs with
   | PolyList.nil => PolyList.nil
-  | PolyList.cons y ys => PolyList.cons (f y) (map α f ys)
+  | PolyList.cons y ys => PolyList.cons (f y) (map f ys)
 
-#eval map Nat (λ x => x*x) someExplicitNats -- PolyList.cons 1 (PolyList.cons 16 (PolyList.cons 49 (PolyList.cons 81 (PolyList.nil))))
-
+-- The implicit argument fails 
 def append (α : Type) (x : α) (xs : PolyList α) : PolyList α :=
   match xs with
   | PolyList.nil => PolyList.cons x PolyList.nil
@@ -280,12 +283,39 @@ def reverseSlow (α : Type) (xs : PolyList α) : PolyList α := -- O(n^2) time, 
   | PolyList.cons y ys => append α y (reverseSlow α ys) 
 
 -- The above reverseSlow can be improved to get O(n) time by using an accumulator
-def reverseHelper (α : Type) (xs acc : PolyList α) : PolyList α :=
+def reverseHelper {α : Type} (xs acc : PolyList α) : PolyList α :=
   match xs with
   | PolyList.nil => acc
-  | PolyList.cons y ys => reverseHelper α ys (PolyList.cons y acc)
+  | PolyList.cons y ys => reverseHelper ys (PolyList.cons y acc)
 
-def reverse (α : Type) (xs : PolyList α) : PolyList α := -- this is O(n) time
-  reverseHelper α xs PolyList.nil
+def reverse {α : Type} (xs : PolyList α) : PolyList α := -- this is O(n) time
+  reverseHelper xs PolyList.nil
 
--- Write filter and fold 
+#eval reverse someExplicitNats
+
+def filter {α : Type} (f : α → Bool) (xs : PolyList α) : PolyList α :=
+  match xs with
+  | PolyList.nil => PolyList.nil
+  | PolyList.cons y ys => if f y then PolyList.cons y (filter f ys) else filter f ys
+
+-- Left Fold
+def fold (α β: Type) (f : β → α → β) (acc : β) (xs : PolyList α) : β := -- tail-recursive
+  match xs with
+  | PolyList.nil => acc
+  | PolyList.cons y ys => fold α β f (f acc y) ys
+
+-- Right Fold
+def rfold (α β : Type) (f : α → β → β) (acc : β) (xs : PolyList α) : β := -- not tail-recursive
+  match xs with
+  | PolyList.nil => acc
+  | PolyList.cons y ys => f y (rfold α β f acc ys)
+
+#eval filter (α := Nat) (λ x => x ≠ 1) someExplicitNats -- the implicit argument has been provided, so don't infer
+#eval fold Nat Nat (λ a x => a + x) 0 someExplicitNats
+
+-- To try next...
+-- map₂ — zip two lists with a function
+-- flatten — flatten a PolyList (PolyList α)
+-- concatMap — map then flatten (a precursor to monads)
+-- Define a Monad or Functor instance manually
+
