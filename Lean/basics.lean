@@ -319,3 +319,74 @@ def rfold (α β : Type) (f : α → β → β) (acc : β) (xs : PolyList α) : 
 -- concatMap — map then flatten (a precursor to monads)
 -- Define a Monad or Functor instance manually
 
+-- Option
+-- List.head? and List.tail? are implemented as Option
+#eval List.head? [1, 2, 3] -- equivalently, [1, 2, 3].head?
+#eval List.tail? [1, 2, 3] -- equivalently, [1, 2, 3].tail?
+
+-- It is a convention to define operations that might fail in groups using the suffixes ? for a version that returns an Option
+
+def List.newHead? {α : Type} (xs : List α) : Option α :=
+  match xs with
+  | [] => none
+  | y :: _ => some y
+
+def List.newTail? {α : Type} (xs : List α) : Option (List α) :=
+  match xs with
+  | [] => none
+  | _ :: ys => some ys
+
+#eval [2, 4, 7, 8].newHead?
+#eval List.newTail? [2, 4, 7, 8]
+
+inductive MyOption (α : Type) where
+  | myNone
+  | mySome (k : α)
+
+open MyOption -- brings the namespace myOption into scope, so you don't have to write full qualified names like myOption.myNone
+-- open can be used globally or locally (inside def, for instance)
+-- open MyOption (mySome) -- expose only this identifier instead of the whole namespace
+
+#eval mySome (2.4 : Float)
+#eval mySome "Tom Holland" -- type inference
+#eval (myNone : MyOption Nat)
+
+#eval [].head? (α := Nat) -- type annotation necessary 
+-- #eval ([] : List Nat).head? -- equivalent to above
+
+-- Product types: defined in the standard library as structure
+def ones : Prod String Nat := { fst := "one", snd := 1 }
+def twos : String × Nat := { fst := "two", snd := 2 } -- α × β as a notation for Prod α β 
+def threes : String × Nat := ("three", 3) -- works too, think of pairs
+
+-- Both the above notations are right-associative
+def fours : String × (String × Int) := ("IV", ("four", 4))
+def fives : String × String × Int := ("V", "fives", 5)
+
+structure MyProd (α β : Type) where
+  fst : α
+  snd : β
+
+notation s " Π " t => MyProd s t 
+
+def newOnes : String Π Int := { fst := "oneeee", snd = "1111" }
+#eval newOnes
+
+-- Sum types
+
+
+
+-- Notations
+#eval some $ String.append "Bruce" " Wayne" -- like in Haskell, $ is right-associative and low-precedence
+#eval "Time" |> String.length -- like in OCaml, Elixir -- equivalent to #eval String.length "Time"
+-- But $, |> are not built-in keywords, they are regular notations
+
+-- You can define notations:
+notation f " | " x => f x 
+
+#eval mySome | String.append "Lean" " Language"
+
+-- Lean also supports function composition through ∘ 
+#eval (String.length ∘ String.trim) "  function composer  "
+
+
