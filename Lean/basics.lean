@@ -10,19 +10,19 @@ def div : Nat → Nat → Nat := fun a b => a / b -- fun instead of λ
 def first : Nat := 4 -- type annotation
 def second := 8
 
-#check add -- add (a b : Nat) : Nat
-#check add first -- add first : Nat -> Nat
-#check add first second -- add first second : Nat
+--#check add -- add (a b : Nat) : Nat
+--#check add first -- add first : Nat -> Nat
+--#check add first second -- add first second : Nat
 
-#eval add first second
--- #eval sub second first
+--#eval add first second
+--#eval sub second first
 
-#check mult -- mult : Nat → Nat → Nat
-#check mult 6  -- mult 6 : Nat → Nat
-#eval mult 6 9
+--#check mult -- mult : Nat → Nat → Nat
+--#check mult 6  -- mult 6 : Nat → Nat
+--#eval mult 6 9
 
-#check div 8 3 -- div 8 3 : Nat
-#eval div 8 3
+--#check div 8 3 -- div 8 3 : Nat
+--#eval div 8 3
 
 -- Lean is expression-oriented
 -- has only conditional expressions, no conditional statements
@@ -37,7 +37,7 @@ def second := 8
 def maximum : Nat → Nat → Nat := 
   λ a b => if a > b then a else b
 
-#eval maximum 17 12
+--#eval maximum 17 12
 
 -- the following function creates a new string by placing its first argument between its second and third arguments
 def joinStringsWith : String → String → String → String :=
@@ -50,8 +50,8 @@ def joinStringsWith : String → String → String → String :=
 def Str : Type := String
 def sail : Str := "Sail"
 
-#check sail -- sail : Str
-#eval sail
+--#check sail -- sail : Str
+--#eval sail
 
 -- but the following will fail (because Lean supports overloaded integer literals)
 -- def N : Type := Nat
@@ -61,14 +61,14 @@ def sail : Str := "Sail"
 def N : Type := Nat
 def six : N := (6 : Nat)
 
-#eval six
+--#eval six
 
 -- better to use abbrev for this purpose?
 abbrev NN : Type := Nat
 def nine : NN := 9
 
 #check nine -- nine : NN
-#eval nine
+--#eval nine
 
 -- Structures ------------------------------------------------------------------------------
 
@@ -79,11 +79,11 @@ deriving Repr -- asks Lean to generate code to display values of type Point (use
  
 def origin : Point := { x := 0, y := 0}
 
-#check origin
-#eval origin
+--#check origin
+--#eval origin
 
-#eval origin.x -- dot notation to extract the individual fields of a structure
-#eval origin.y
+--#eval origin.x -- dot notation to extract the individual fields of a structure
+--#eval origin.y
 
 def addPoints : Point → Point → Point :=
   λ a b => { x := a.x + b.x, y := a.y + b.y }
@@ -107,12 +107,15 @@ def zeroX : Point → Point :=
 -- the following syntax may be used although not considered good practice 
 #check Point.mk 1.4 2.7 -- applying constructor directly instead of using curly-brace initialization syntax
 
+-- Can also use ⟨ ⟩ syntax (positional arguments) to build a structure
+#eval (⟨1.4, 2.7⟩ : Point) -- equivalent to Point.mk 1.4 2.7
+
 -- An accessor function is defined for each field of a structure
 #check Point.x 
 #check Point.y -- Point.y (self : Point) : Float
 
 #eval Point.x origin -- 0.000000
-#eval origin.x -- same thing as above
+--#eval origin.x -- same thing as above
 
 -- The dot accessor notation can be generalized as follows
 -- TARGET.f ARG1 ARG2 .....
@@ -149,11 +152,11 @@ inductive NaturalNumber where
   | succ : NaturalNumber → NaturalNumber -- alternatively, succ (k : NaturalNumber) : NaturalNumber
 
 def one : NaturalNumber := NaturalNumber.succ NaturalNumber.zero
-#check one -- one : NaturalNumber
-#eval one -- NaturalNumber.succ NaturalNumber.zero
+--#check one -- one : NaturalNumber
+--#eval one -- NaturalNumber.succ NaturalNumber.zero
 
 def two : NaturalNumber := NaturalNumber.succ one
-#eval two -- NaturalNumber.succ (NaturalNumber.succ (NaturalNumber.zero))
+--#eval two -- NaturalNumber.succ (NaturalNumber.succ (NaturalNumber.zero))
 
 def three := NaturalNumber.succ two -- no annotation, type inference
 
@@ -212,7 +215,7 @@ def leanProver := xyConcat polyOrigin
 def replaceY (α : Type) (point : PolyPoint α) (newYcoor : α) : PolyPoint α :=
   { point with ycoor := newYcoor }
 
-#check (replaceY) -- replaceY : (α : Type) → PolyPoint α → α → PolyPoint α
+--#check (replaceY) -- replaceY : (α : Type) → PolyPoint α → α → PolyPoint α
 
 -- Providing the first argument, Nat, causes all occurrences of α in the remainder of the type to be replaced with Nat (currying)
 #check (replaceY Nat) -- replaceY Nat : PolyPoint Nat → Nat → PolyPoint Nat
@@ -288,10 +291,10 @@ def reverseHelper {α : Type} (xs acc : PolyList α) : PolyList α :=
   | PolyList.nil => acc
   | PolyList.cons y ys => reverseHelper ys (PolyList.cons y acc)
 
-def reverse {α : Type} (xs : PolyList α) : PolyList α := -- this is O(n) time
+def reverseFast {α : Type} (xs : PolyList α) : PolyList α := -- this is O(n) time
   reverseHelper xs PolyList.nil
 
-#eval reverse someExplicitNats
+--#eval reverseFast someExplicitNats
 
 def filter {α : Type} (f : α → Bool) (xs : PolyList α) : PolyList α :=
   match xs with
@@ -339,8 +342,6 @@ def List.newTail? {α : Type} (xs : List α) : Option (List α) :=
 #eval [2, 4, 7, 8].newHead?
 #eval List.newTail? [2, 4, 7, 8]
 
-I did some exercises from the official Lean book
-
 -- implementing last (like Haskell's)
 def List.last? {α : Type} (xs : List α) : Option α :=
   match xs with
@@ -359,6 +360,25 @@ def List.findFirst? {α : Type} (xs : List α) (predicate : α → Bool) : Optio
 
 #eval List.findFirst? [2, 4, 7] (λ x => x ≠ 2)
 
+-- You can also leave the implicit argument out in the signature itself leaving all to type inference (see the following)
+-- Haskell-like take function
+def newTake (n : Nat) (xs : List α) : List α := -- List.take is defined in the standard library
+  match xs with
+  | [] => []
+  | y :: ys => if n > 0 then y :: newTake (n - 1) ys else []
+
+-- Pattern-matching definitions
+-- The same function without using match keyword (note the change in syntax)
+def take : Nat → List α → List α 
+  | 0, _ => []
+  | _, [] => []
+  | n, y :: ys => y :: take (n-1) ys
+
+def drop : Nat -> List α → List α
+  | 0, xs => xs
+  | _, [] => []
+  | n, _ :: ys => drop (n-1) ys
+
 inductive MyOption (α : Type) where
   | myNone
   | mySome (k : α)
@@ -372,7 +392,7 @@ open MyOption -- brings the namespace myOption into scope, so you don't have to 
 #eval (myNone : MyOption Nat)
 
 #eval [].head? (α := Nat) -- type annotation necessary 
--- #eval ([] : List Nat).head? -- equivalent to above
+#eval ([] : List Nat).head? -- equivalent to above
 
 -- Product types: defined in the standard library as structure
 def ones : Prod String Nat := { fst := "one", snd := 1 }
@@ -419,9 +439,101 @@ def myNat : String Σ Nat := MySum.inr 5
 -- In most situations, it is more readable and maintainable to use a custom inductive type.
 -/
 
+-- Local definitions: use 'let' to store intermediate values
 
+-- Local definitions with let may also use pattern matching when one pattern is enough to match all cases of a datatype (see below)
+def unzip : List (α × β) → List α × List β
+  | [] => ([], [])
+  | (x, y) :: xys => 
+    let (xs, ys) : List α × List β := unzip xys -- to avoid multiple computation of the same value
+    (x :: xs, y :: ys)
 
+#eval unzip [(2, "time"), (4, "mimick"), (3, "spare")] -- ([2, 4, 3], ["time", "mimick", "spare"])
 
+-- The biggest difference between let and def is that recursive let definitions must be explicitly indicated by writing let rec
+def reverse (xs : List α) : List α :=
+  let rec helper : List α → List α → List α -- can't use def here
+    | [], soFar => soFar
+    | y :: ys, soFar => helper ys (y :: soFar)
+  helper xs []
+
+-- def, inductive, structure, theorem, etc. are always global
+-- Only let and let rec are allowed inside expressions
+
+-- Simultaneous matching
+
+-- similar to the pattern-matching definition
+def sameLength? (xs : List α) (ys : List β) : Bool :=
+  match xs, ys with
+  | [], [] => true
+  | _ :: xs', _ :: ys' => sameLength? xs' ys'
+  | _, _ => false
+
+#eval sameLength? [1, 2] ["one", "two", "three"]
+
+-- Natural number patterns
+
+def even : Nat → Bool
+  | 0 => true
+  | k + 1 => ¬ even k
+
+def halve : Nat → Nat
+  | 0 => 0
+  | 1 => 0
+  | k + 2 => halve k + 1 -- | 2 + k => halve k + 1 would have been an error
+
+-- Namespaces
+
+-- Each name in Lean occurs in a namespace, which is a collection of names
+-- Names are placed in namespaces using . (dot)
+
+-- Names can be directly defined within a namespace
+def List.double : List Nat → List Nat
+  | [] => []
+  | x :: xs => x * 2 :: List.double xs
+
+#eval List.double [3, 4]
+
+-- Alternatively, namespace keyword may be used
+namespace LittleSpace
+def double : Nat → Nat | x => 2*x
+def triple : Int → Int | x => 3*x
+end LittleSpace
+
+#eval LittleSpace.double 12
+#eval LittleSpace.triple (-2)
+
+-- Namespace can be opened, to bring the names defined inside that namespace in scope
+def quadruple (x : Nat) : Nat :=
+  open LittleSpace in
+  double $ double x
+
+-- if let
+-- When consuming values that have a sum type, it is often the case that only a single constructor is of interest
+
+inductive Inline where
+  | lineBreak
+  | string : String → Inline
+  | emph : Inline → Inline
+  | strong (k : Inline)
+
+def Inline.string? (inline : Inline) : Option String :=
+  if let Inline.string s := inline then some s else none
+
+#eval Inline.string "Devil" |> Inline.string?
+
+-- String interpolation
+
+-- expressions contained in curly braces inside the string are replaced with their values (like f-strings of Python)
+#eval s!"This is {LittleSpace.double 1}"
+
+-- Be warned: not all expressions cannot be converted to strings (use deriving Repr syntax for that)
+
+-- Anonymous functions
+
+-- Every simple functions can be written using ⬝ (cdot) as a placeholder
+#eval (· - 2) 7 -- subtraction
+#eval filter (α := Nat) (· ≠ 1) someExplicitNats -- the implicit argument has been provided, so don't infer
 
 -- Notations
 #eval some $ String.append "Bruce" " Wayne" -- like in Haskell, $ is right-associative and low-precedence
