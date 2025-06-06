@@ -113,7 +113,31 @@ theorem newtheo : 1 + 1 = 2 := by -- by
 
 -- Connectives: ∧ ∨
 
+-- decide tactic is powerful enough to prove the above theorem
 theorem r1 : 1 + 2 = 3 ∧ "Lean".append "Prover" = "LeanProver" := by
   decide
 
+theorem trueOrFalse : True ∨ False ↔ True := by decide
+theorem trueAndTrue : True ∧ True ↔ True := by decide
+theorem trueOrtrue : True ∨ True ↔ True := by decide
+theorem falseAndFalse : False ∧ False ↔ False := by decide
+theorem falseOrTrue : False ∨ True ↔ True := by decide
+theorem notTrueIsFalse : ¬True ↔ False := by decide
+theorem notFalseIsTrue : ¬False ↔ True := by decide
+theorem falseImpliesTrue : False → True := by decide
 
+-- Evidence as arguments
+
+def third (xs : List α) : α := xs[2] -- error: failed to prove the index is valid
+
+def fourth (xs : List α) (ok : xs.length > 3) : α := xs[3] -- works
+
+-- When the function is called on a concrete list, its length is known.
+-- In these cases, 'by decide' can construct the evidence automatically
+#eval fourth [3, 4, 7, 8, 2] (by decide)
+
+-- fifth entry in a list by passing the evidence that this lookup is safe as an argument to the function
+def fifth (xs : List α) (ok : xs.length ≥ 5) : α := xs[4]
+
+#eval fifth ["A", "S", "H", "O", "T", "Y"] (by simp) -- by simplification
+#eval fifth [-2, -4, 8] (by decide) -- will fail
