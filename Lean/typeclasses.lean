@@ -136,8 +136,12 @@ instance : OfNat Even 6 where
 instance : OfNat Even 8 where
   ofNat := (4 : Even) * (2 : Even)
 
+-- Equality check
+instance : BEq Even where
+  beq n m := n.toNat == m.toNat
+
 #eval (8 : Even).toNat
 #eval ((8 : Even) * (6 : Even)).toNat
-
+#eval (8 : Even) == (6 : Even)
 
 
