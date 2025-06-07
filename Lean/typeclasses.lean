@@ -61,4 +61,83 @@ def getPos : Pos → Nat
 
 #eval getPos $ plus five four -- 9
 
+-- Zero and OfNat
+-- Zero and OfNat are two type classes that are used to overload numeric literals.
+
+-- Because many types have values that are naturally written with 0, the Zero class allow these specific values to be overridden
+class Zero' (α : Type) where
+  zero : α
+
+-- This type class takes two arguments: α is the type for which a natural number is overloaded, and the unnamed Nat argument is the actual literal number that was encountered in the program
+class OfNat' (α : Type) (_ : Nat) where -- 
+  ofNat : α
+
+I was experimenting with my own even number datatype
+
+-- Let's implement even numbers
+inductive Even where
+  | zero
+  | succ : Even → Even
+deriving Repr
+
+-- Addition on even numbers
+def Even.add : Even → Even → Even
+  | Even.zero, n => n
+  | Even.succ k, n => Even.succ $ Even.add k n
+
+-- Predecessor
+def Even.pred : Even → Even
+  | Even.zero => Even.zero
+  | Even.succ k => k
+
+-- Subtraction
+def Even.sub : Even → Even → Even
+  | k, Even.zero => k
+  | Even.zero, _ => Even.zero
+  | Even.succ n, Even.succ k => Even.sub n k
+
+-- Multiplication
+def Even.mul : Even → Even → Even
+  | _, Even.zero => Even.zero
+  | k, Even.succ Even.zero => Even.add k k
+  | n, Even.succ k => Even.add (Even.mul n k) (Even.add n n)
+
+-- Defining zero
+instance : Zero Even where
+  zero := Even.zero
+
+-- To use + operator for evens
+instance : Add Even where
+  add := Even.add
+
+-- To use - operator for evens
+instance : Sub Even where
+  sub := Even.sub
+
+-- To use * operator for evens
+instance : Mul Even where
+  mul := Even.mul
+
+-- Even to Nat
+def Even.toNat : Even → Nat
+  | Even.zero => 0
+  | Even.succ k => toNat k + 2
+
+-- Overloading some natural literals
+instance : OfNat Even 2 where
+  ofNat := Even.succ Even.zero
+
+instance : OfNat Even 4 where
+  ofNat := Even.succ (2: Even)
+
+instance : OfNat Even 6 where
+  ofNat := (4 : Even) + (2 : Even)
+
+instance : OfNat Even 8 where
+  ofNat := (4 : Even) * (2 : Even)
+
+#eval (8 : Even).toNat
+#eval ((8 : Even) * (6 : Even)).toNat
+
+
 
