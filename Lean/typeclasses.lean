@@ -72,8 +72,6 @@ class Zero' (α : Type) where
 class OfNat' (α : Type) (_ : Nat) where -- 
   ofNat : α
 
-I was experimenting with my own even number datatype
-
 -- Let's implement even numbers
 inductive Even where
   | zero
@@ -140,8 +138,104 @@ instance : OfNat Even 8 where
 instance : BEq Even where
   beq n m := n.toNat == m.toNat
 
-#eval (8 : Even).toNat
-#eval ((8 : Even) * (6 : Even)).toNat
+-- to implement string printing (Repr) for Even type
+instance : Repr Even where
+  reprPrec e _ := repr (e.toNat)
+
+#eval (8 : Even) -- instead of (8 : Even).toNat
+#eval ((8 : Even) * (6 : Even))
 #eval (8 : Even) == (6 : Even)
 
+-- Instance implicits
 
+-- A function that sums all entries in a list needs two instances:
+-- (1) Add allows the entries to be added, i.e. instance : Add α 
+-- (2) an OfNat instance for 0 provides a sensible value to return for the empty list, i.e. instance : OfNat α 0 (or Zero α)
+def List.sumOfContents [Add α] [OfNat α 0] : List α → α
+  | [] => 0                                               -- 0 : α (type inference)
+  | x :: xs => x + List.sumOfContents xs
+
+def List.mulOfContents [Mul α] [Zero α] : List α → α
+  | [] => 0
+  | x :: [] => x
+  | x :: xs => x * List.mulOfContents xs
+
+def someListOfEvens : List Even := [4, 8, 2, 6]
+#eval someListOfEvens.sumOfContents
+#eval someListOfEvens.mulOfContents
+
+/-
+-- Instance implicits are specifications of required instances in square brackets.
+-- Behind the scenes, every type class defines a structure that has a field for each overloaded operation.
+-- Instances are values of that structure type, with each field containing an implementation.
+-- At a call site, Lean is responsible for finding an instance value to pass for each instance implicit argument.
+-- The most important difference between ordinary implicit arguments and 
+-- instance implicits is the strategy that Lean uses to find an argument value.
+-- In the case of ordinary implicit arguments, Lean uses a technique called unification
+-- to find a single unique argument value that would allow the program to pass the type checker.
+-- This process relies only on the specific types involved in the function's definition and the call site.
+-- For instance implicits, Lean instead consults a built-in table of instance values.
+-/
+
+-- Heterogeneous addition
+
+def addNatEven : Nat → Even → Nat
+  | n, k => n + k.toNat
+
+def addEvenNat : Even → Nat → Nat
+  | k, n => k.toNat + n 
+
+instance : HAdd Nat Even Nat where
+  hAdd := addNatEven
+
+instance : HAdd Even Nat Nat where
+  hAdd := addEvenNat
+
+#eval (1 : Nat) + (2 : Even)
+#eval (4 : Even) + (6 : Nat)
+
+-- HAdd and HMul be like...
+class HAdd' (α β γ : Type) where
+  hAdd' : α → β → γ 
+
+class HMul' (α β γ : Type) where
+  hMul' : α → β → γ
+
+-- Look up: output parameters and default instances
+
+-- Arrays
+
+/- 
+-- Lean arrays are much more efficient than linked lists for most purposes.
+-- Array α is much like C++ std::vector or Rust Vec.
+-- Arrays occupy a contiguous region of memory, which is much better for processor caches.
+-- Looking up a value in an array takes O(1), while lookup in a linked list takes O(n).
+-/
+
+def heroes : Array String := #["Bruce Wayne", "Peter Parker", "Tony Stark"]
+def langs := #["Lean", "Rust", "Haskell"]
+
+#eval heroes.size -- 3
+#eval heroes[0] -- "Bruce Wayne"
+
+-- using abbrev
+abbrev nonEmpty? (xs : Array α) := xs.size > 0
+abbrev sameSize? (xs : Array α) (ys : Array β) := xs.size == ys.size
+
+theorem thm1 : nonEmpty? heroes := by decide
+theorem thm2 : sameSize? heroes langs := by decide
+
+-- Look up: Overloading indexing using GetElem type class
+
+-- Standard classes
+
+/-
+-- Unlike C++, infix operators in Lean are defined as abbreviations for named functions;
+-- this means that overloading them for new types is not done using the operator itself,
+-- but rather using the underlying name (such as HAdd.hAdd).
+-/
+
+/-
+-- Arithmetic: HAdd.hAdd, HSub.hSub, HMul.hMul, HDiv.hDiv, HMod.hMod, HPow.hPow., Neg.neg
+-- Bitwise operators
+-/
