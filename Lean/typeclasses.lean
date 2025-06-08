@@ -239,3 +239,121 @@ theorem thm2 : sameSize? heroes langs := by decide
 -- Arithmetic: HAdd.hAdd, HSub.hSub, HMul.hMul, HDiv.hDiv, HMod.hMod, HPow.hPow., Neg.neg
 -- Bitwise operators
 -/
+
+-- overloading <, ≤, >, ≥
+-- since the concerned typeclasses except Prop instead of Bool, we implement using Prop
+def lessThan : Even → Even → Prop
+  | 0, 0 => False                                 -- False : Prop
+  | 0, _ => True                                  -- instead of true : Bool
+  | _, 0 => False
+  | Even.succ n, Even.succ k => lessThan n k
+
+def lessOrEquals : Even → Even → Prop
+  | 0, _ => True
+  | _, 0 => False
+  | Even.succ n, Even.succ k => lessOrEquals n k
+
+def greaterThan : Even → Even → Prop
+  | 0, 0 => False
+  | 0, _ => False
+  | _, 0 => True
+  | Even.succ n, Even.succ k => greaterThan n k
+
+def greaterOrEquals : Even → Even → Prop
+  | _, 0 => True
+  | 0, _ => False
+  | Even.succ n, Even.succ k => greaterOrEquals n k
+
+instance : LT Even where
+  lt := lessThan
+
+instance : LE Even where
+  le := lessOrEquals
+
+-- also use LT for greater than by switching the arguments
+instance : LT Even where 
+  lt y x := greaterThan x y
+
+instance : LE Even where
+  le y x := greaterOrEquals x y
+
+def zero' : Even := 0
+def two' : Even := 2
+def four' : Even := 4
+def six' : Even := 6
+def eight' : Even := 8
+
+-- will need more work than the above to get it to work....oops
+
+-- Deriving standard classes
+
+deriving Repr for Even
+deriving BEq for Even -- Boolean equality
+
+-- Appending (++) 
+
+#eval [2, 3, 4] ++ [6]
+#eval ["Linux"] ++ ["Symbian", "macOS"]
+
+-- our custom List
+inductive lameList (α : Type) where
+  | nil
+  | cons : α → lameList α → lameList α
+deriving Repr, BEq, Hashable
+
+open lameList
+
+def list1 : lameList String := cons "Kierkegaard" nil
+def list2 : lameList String := cons "Wittgenstein" $ cons "Nietzsche" $ cons "Sartre" nil
+
+def lameListConstruct : List α → lameList α
+  | [] => nil
+  | x :: xs => cons x (lameListConstruct xs)
+
+#eval lameListConstruct ["Dmitri", "Ivan", "Alyosha"]
+#eval list2 == (lameListConstruct ["Wittgenstein", "Nietzsche", "Sartre"]) -- because we derived BEq for our lameList
+
+-- length function of our lameList
+def lameList.length {α : Type} : lameList α → Nat
+  | nil => 0
+  | cons _ xs => 1 + xs.length
+
+-- to append a single element
+def lameList.appendElm {α : Type} : lameList α → α → lameList α
+  | nil, k => cons k nil
+  | cons x xs, k => cons x (xs.appendElm k) 
+
+-- to append two lameLists
+def lameList.append {α : Type} : lameList α → lameList α → lameList α
+  | xs, nil => xs
+  | xs, cons y ys => lameList.append (xs.appendElm y) ys -- very inefficient: try to improve
+
+#eval list1.appendElm "Schopenhauer"
+#eval list1.append list2
+#eval lameList.append list2 list1
+
+-- Overloading appending (++)
+-- to overload ++, use HAppend (heterogeneous) or Append
+
+instance : Append (lameList α) where
+  append := lameList.append
+
+#eval list1 ++ list2 -- works
+#eval (list1 ++ list2) == (list1.append list2) -- true
+
+theorem thm3 : (list1 ++ list2) = (list1.append list2) := by decide -- failed to synthesize Decidable (list1 ++ list2 = list1.append list2)
+
+-- Functors
+
+/-
+-- A polymorphic type is a functor if it has an overload for a function named map that
+-- transforms every element contained in it by a function.
+-- For instance, mapping a function f over an Option leaves none untouched, and replaces some x with some (f x)
+--
+-- Lean provides an infix operator for mapping a function, namely <$>
+-/
+
+#eval List.map (λ x => x ^ 2) [1, 2, 3, 4, 5] -- [1, 4, 9, 16, 25]
+#eval (⬝ ^ 2) <$> [1, 2, 3, 4, 5] -- [1, 4, 9, 16, 25]
+
+
