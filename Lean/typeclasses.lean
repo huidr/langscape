@@ -389,3 +389,37 @@ def layeredList : lameList (Array Nat) := cons #[2, 3, 5, 7] $ cons #[2, 4, 6, 8
        i.e.,    map (fun y => f (g y)) x equals map f (map g x)
 -/
 
+-- a binary tree prototype
+inductive BTree' (α : Type) where
+  | nill
+  | node (value : α) (left : BTree' α) (right : BTree' α)
+deriving Repr
+
+def BTree'.toList {α : Type} : BTree' α → List α
+  | BTree'.nill => []
+  | BTree'.node value left right => [value] ++ left.toList ++ right.toList
+
+def BTree'.length {α : Type} : BTree' α → Nat
+  | BTree'.nill => 0
+  | BTree'.node _ left right => 1 + left.length + right.length
+
+def emptyTree' : BTree' String := BTree'.nill
+def oneNodeTree' : BTree' String := BTree'.node "Dostoevsky" BTree'.nill BTree'.nill
+
+#eval emptyTree'
+#eval oneNodeTree'
+#eval emptyTree'.length
+#eval oneNodeTree'.length
+
+/-
+-- Appending an element to a BTree' (the code is unfinished)
+def BTree'.append {α : Type} : BTree' α → α → BTree' α
+  | BTree'.nil, k => BTree'.node k BTree'.nil BTree'.nil
+  | BTree'.node _ BTree'.nill _, k => BTree'.node _ (BTree'.node k BTree'.nil BTree'.nil) _
+  | BTree'.node _ _ BTree'.nill, k => BTree'.node _ _ (BTree'.node k BTree'.nil BTree'.nil)
+  | BTree'.node _ left right, k => 
+-/
+
+-- Challenge: given the size of a BTree', find the exact position where the next (new) element must go to
+
+
