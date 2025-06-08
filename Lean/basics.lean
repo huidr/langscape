@@ -485,7 +485,7 @@ def halve : Nat → Nat
 -- Namespaces
 
 -- Each name in Lean occurs in a namespace, which is a collection of names
--- Names are placed in namespaces using . (dot)
+-- Names are placed in namespaces using .
 
 -- Names can be directly defined within a namespace
 def List.double : List Nat → List Nat
