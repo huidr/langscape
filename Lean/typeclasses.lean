@@ -365,9 +365,27 @@ def lameList.map {α β : Type} (f : α → β) : lameList α → lameList β
 #eval lameList.map String.length list2 -- it works
 
 -- to use <$> operator
+-- the instance is defined for lameList rather than for lameList α because the argument type α plays no role in resolving the type class
 instance : Functor lameList where
   map := lameList.map -- map f xs := lameList.map f xs
 
 #eval String.length <$> list2 -- it works
 
+/-
+-- Even when the type contained in a functor is itself a functor,
+-- mapping a function only goes down down layer.
+-- (See example below)
+-/
+
+def layeredList : lameList (Array Nat) := cons #[2, 3, 5, 7] $ cons #[2, 4, 6, 8] nil
+#eval Array.size <$> layeredList                  -- works, since it goes down just one level
+#eval (· ^ 2) <$> layeredList                     -- failed to synthesize HPow (Array Nat) Nat ?m.14757
+
+/-
+-- Functor instances should follow two rules
+-- (1) Mapping the identity function should result in the original argument,
+       i.e.,    id <$> x equals x
+-- (2) Mapping two composed functions should have the same effect as composing their mapping,
+       i.e.,    map (fun y => f (g y)) x equals map f (map g x)
+-/
 
