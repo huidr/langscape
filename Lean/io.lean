@@ -141,3 +141,12 @@ def fifth (xs : List α) (ok : xs.length ≥ 5) : α := xs[4]
 
 #eval fifth ["A", "S", "H", "O", "T", "Y"] (by simp) -- by simplification
 #eval fifth [-2, -4, 8] (by decide) -- will fail
+
+-- Experimenting with shorthands
+
+def val₁ : Nat := 1
+def val₂ : Nat := 2
+
+#eval val₂ + val₂ 
+
+example ex1 : 1 + 2 = 3 := by decide 

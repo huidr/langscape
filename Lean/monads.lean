@@ -1,3 +1,7 @@
 -- Monads
 
+def timer : Nat → Bool
+  | 0 => true
+  | _ => false
 
+theorem t1 : timer 4 = true := by decide
