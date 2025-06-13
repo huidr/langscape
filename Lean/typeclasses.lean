@@ -49,7 +49,7 @@ open Plus (plus)
 
 def one := Pos.one
 def two := Pos.succ Pos.one
-def three := plus two one
+def three := plus two oneS
 def four := plus three one
 def five := plus four one
 
@@ -421,5 +421,57 @@ def BTree'.append {α : Type} : BTree' α → α → BTree' α
 -/
 
 -- Challenge: given the size of a BTree', find the exact position where the next (new) element must go to
+
+--- Coercions
+
+/-
+-- When Lean encounters an expression of one type in a context that expects a different type,
+-- it will attempt to coerce the expression before reporting a type error.
+-- Unlike Java, C, and Kotlin, the coercions are extensible by defining instances of type classes.
+-/
+
+-- The type class Coe describes overloaded ways of coercing from one type to another
+
+instance : Coe Even Nat where
+  coe x := x.toNat
+
+#eval [1, 4, 2, 9].drop (2 : Even) -- drop expects a Nat, no Even, but coercion occurs
+#check [1, 4, 2, 9].drop (2 : Even) -- List.drop (Even.toNat 2) [1, 4, 2, 9] : List Nat
+
+-- Coercions can be chained: such as using two coercions: from A to B, then from B to C
+
+-- The Lean standard library defines a coercion from any type α to Option α that wraps the value in some.
+
+def List.myLast? : List α → Option α
+  | [] => none
+  | [x] => x           -- instead of some x
+  | _ :: xs => myLast? xs
+
+#eval [7, 8, 9, 12].myLast? -- some 12
+
+-- Look up: Dependent coercions can be used when the ability to coerce from one type to another
+-- depends on which particular value is being coerced. 
+
+-- Coercing to types
+
+-- Think of mathematical monoid
+structure Monoid where
+  Carrier : Type                      -- underlying set
+  neutral : Carrier                   -- identity element
+  op : Carrier → Carrier → Carrier    -- monoid operation
+
+-- Natural numbers addition as monoid
+def natAddMonoid : Monoid := 
+  { Carrier := Nat, neutral := 0, op := (· + ·) }
+
+-- Natural numbers multiplication as monoid
+def natMulMonoid : Monoid :=
+  { Carrier := Nat, neutral := 1, op := (· * ·) }
+
+def stringMonoid : Monoid :=
+  { Carrier := String, neutral := "", op := String.append }
+
+def listMonoid (α : Type) : Monoid :=
+  { Carrier := String α, neutral := [], op := List.append }
 
 
