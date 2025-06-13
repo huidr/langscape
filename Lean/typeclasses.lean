@@ -494,3 +494,28 @@ def someExperimentalEvens : List Even := [2, 4, 6, 8]
 
 #eval foldMap natMulMonoid (·) [1, 2, 3, 4, 5]
 #eval foldMap natAddMonoid Even.toNat someExperimentalEvens
+
+-- Look up: The CoeSort class is just like the Coe class, with the exception...
+-- that the target of the coercion must be a sort, namely Type or Prop. 
+
+-- Three ways do define type class instances:
+
+class Display (α : Type) where
+  displayName : α → String
+
+structure Tree where
+  latinName : String
+  commonNames : List String
+
+instance : Display Tree :=
+  ⟨Tree.latinName⟩                      -- like a struct
+
+instance : Display Tree :=
+  { displayName := Tree.latinName }     -- like a struct
+
+instance : Display Tree where
+  displayName := Tree.latinName
+
+-- Examples
+
+
