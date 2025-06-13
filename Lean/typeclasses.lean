@@ -518,4 +518,16 @@ instance : Display Tree where
 
 -- Examples
 
+-- Lean supports the explicit indication of examples in a source file. An example is like a definition without a name.
+-- Examples may also define functions by accepting arguments
 
+example : List String := ["Lean", "Prover", "Assistant", "Theoremer"]
+example (n : Nat) (k : Nat) : Bool :=
+  n + k == k + n
+
+/-
+-- While this creates a function behind the scenes, this function has no name and cannot be called.
+-- Nonetheless, this is useful for demonstrating how a library can be used with arbitrary or unknown values of some given type.
+-- In source files, example declarations are best paired with comments that explain how
+-- the example illustrates the concepts of the library.
+-/
