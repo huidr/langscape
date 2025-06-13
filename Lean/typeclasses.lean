@@ -455,23 +455,42 @@ def List.myLast? : List α → Option α
 -- Coercing to types
 
 -- Think of mathematical monoid
-structure Monoid where
-  Carrier : Type                      -- underlying set
+structure Monoid (Carrier : Type) where
+--  Carrier : Type                      -- underlying set
   neutral : Carrier                   -- identity element
   op : Carrier → Carrier → Carrier    -- monoid operation
 
 -- Natural numbers addition as monoid
-def natAddMonoid : Monoid := 
-  { Carrier := Nat, neutral := 0, op := (· + ·) }
+def natAddMonoid : Monoid Nat := 
+  { neutral := 0, op := (· + ·) }
 
 -- Natural numbers multiplication as monoid
-def natMulMonoid : Monoid :=
-  { Carrier := Nat, neutral := 1, op := (· * ·) }
+def natMulMonoid : Monoid Nat :=
+  { neutral := 1, op := (· * ·) }
 
-def stringMonoid : Monoid :=
-  { Carrier := String, neutral := "", op := String.append }
+def stringMonoid : Monoid String :=
+  { neutral := "", op := String.append }
 
-def listMonoid (α : Type) : Monoid :=
-  { Carrier := String α, neutral := [], op := List.append }
+def listMonoid (α : Type) : Monoid (List α) :=
+  { neutral := [], op := List.append }
 
+/-
+-- Given a monoid, it is possible to write the foldMap function that, in a single pass,
+-- transforms the entries in a list into a monoid's carrier set and then combines them using the monoid's operator.
+-- Because monoids have a neutral element, there is a natural result to return when the list is empty,
+-- and because the operator is associative, clients of the function don't have to care
+-- whether the recursive function combines elements from left to right or from right to left.
+-/
 
+-- receives a list, converts into a monoid, and do fold operation using the monoid's operation
+-- if list empty, returns the neutral element
+def foldMap (M : Monoid β) (f : α → β) (xs : List α) : β :=
+  let rec go (soFar : β) : List α → β
+    | [] => soFar
+    | y :: ys => go (M.op soFar (f y)) ys
+  go M.neutral xs
+
+def someExperimentalEvens : List Even := [2, 4, 6, 8]
+
+#eval foldMap natMulMonoid (·) [1, 2, 3, 4, 5]
+#eval foldMap natAddMonoid Even.toNat someExperimentalEvens
