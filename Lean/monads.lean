@@ -156,3 +156,7 @@ def firstThirdFifthSeventh [Monad m] (lookup : List α → Nat → m α) (xs : L
   pure (← lookup xs 0, ← lookup xs 2, ← lookup xs 4, ← lookup xs 6)
 
 #eval firstThirdFifthSeventh (λ xs i => xs[i]?) [7, 8, 12, 4, 3, 10, 1]
+
+-- The #print command reveals the internals of Lean datatypes and definitions
+#print IO
+#print IO.Error -- all constructors of IO.Error -- list of errors IO action can give 
