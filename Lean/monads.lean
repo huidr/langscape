@@ -141,3 +141,18 @@ There is a contract that each instance of Monad should obey.
 
 -/
 
+-- do-notation for monads: allows more concise and tidier syntax which is reminiscent of imperative-style programming
+
+-- rewriting our firstThirdFifthSeventh using do-notation
+def _firstThirdFifthSeventh' [Monad m] (lookup : List α → Nat → m α) (xs : List α) : m (α × α × α × α) := do
+  let first ← lookup xs 0
+  let third ← lookup xs 2
+  let fifth ← lookup xs 4
+  let seventh ← lookup xs 6
+  pure (first, third, fifth, seventh)
+
+-- can make it even more succinct
+def firstThirdFifthSeventh [Monad m] (lookup : List α → Nat → m α) (xs : List α) : m (α × α × α × α) := do
+  pure (← lookup xs 0, ← lookup xs 2, ← lookup xs 4, ← lookup xs 6)
+
+#eval firstThirdFifthSeventh (λ xs i => xs[i]?) [7, 8, 12, 4, 3, 10, 1]
