@@ -193,3 +193,43 @@ But, there is a deeper relationship between the two: _every monad is a functor_
 * Every monad is an applicative functor, and every applicative functor is a functor, but the converses do not hold.
 
 -/
+
+-- *Structure inheritance*
+
+-- much like inheritance of object-oriented paradigm
+structure MythicalCreature where
+  large : Bool
+deriving Repr
+
+structure Monster extends MythicalCreature where       -- every monster is also mythical
+  vulnerability : String
+deriving Repr
+
+def troll : Monster where
+  large := true
+  vulnerability := "sunlight"
+
+def goblin : Monster := {large := false, vulnerability := "spears"}
+
+def vampire : Monster := ⟨false, "sunlight"⟩ -- will fail
+def vampire : Monster := ⟨⟨false⟩, "sunlight"⟩ -- works -- because inheritance is implemented using composition
+
+/-
+
+Note: _Inheritance is implemented using composition_.
+
+In addition to defining functions to extract the value of each new field,
+a function Monster.toMythicalCreature is defined with type Monster → MythicalCreature.
+This can be used to extract the underlying creature.
+
+Unlike upcasting in OOP languages (in which an upcast operator causes 
+a value from a derived class to be treated as an instance of the parent class,
+but the value retains its identity and structure),
+in Lean, however, moving up the inheritance hierarchy actually erases the underlying information.
+
+-/
+
+#eval goblin.toMythicalCreature -- loses the information of vulnerability
+
+-- _Multiple inheritance is possible_
+
