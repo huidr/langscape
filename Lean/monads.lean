@@ -231,5 +231,17 @@ in Lean, however, moving up the inheritance hierarchy actually erases the underl
 
 #eval goblin.toMythicalCreature -- loses the information of vulnerability
 
--- _Multiple inheritance is possible_
+-- _Multiple inheritance is possible_ (does automatic collapsing of diamonds: choose the first one that appears in the declaration)
 
+/-
+
+## _Type classes can be inherited_
+
+* Behind the scenes, type classes are structures.
+* Defining a new type class defines a new structure, and defining an instance creates a value of that structure type.
+* A consequence of this is that type classes may inherit from other type classes.
+
+* Because it uses precisely the same language features, type class inheritance supports all the features of structure inheritance.
+* This includes multiple inheritance, default implementations of parent types' methods, and automatic collapsing of diamonds. 
+
+-/
