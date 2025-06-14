@@ -160,3 +160,36 @@ def firstThirdFifthSeventh [Monad m] (lookup : List α → Nat → m α) (xs : L
 -- The #print command reveals the internals of Lean datatypes and definitions
 #print IO
 #print IO.Error -- all constructors of IO.Error -- list of errors IO action can give 
+
+-- multiple patterns sharing the same result expression can be made more concise
+inductive Weekday where
+  | monday
+  | tuesday
+  | wednesday
+  | thursday
+  | friday
+  | saturday
+  | sunday
+deriving Repr
+
+def Weekday.isWeekend : Weekday → Bool
+  | .saturday | .sunday => true
+  | _ => false
+
+#print Weekday
+#print Weekday.monday
+#print Weekday.isWeekend
+
+/-
+
+## Functors vs Monads 
+
+Functor describes containers in which the contained data can be transformed, and Monad describes an encoding of programs with side effects.
+
+But, there is a deeper relationship between the two: _every monad is a functor_
+
+* Applicative functors is an intermediate between the two; it has enough power to write many interesting programs and yet permits libraries that cannot use the Monad interface.
+* Applicative type class provides the overloadable operations of applicative functors.
+* Every monad is an applicative functor, and every applicative functor is a functor, but the converses do not hold.
+
+-/
