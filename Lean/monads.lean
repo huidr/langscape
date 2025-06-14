@@ -119,5 +119,25 @@ def _firstThirdFifthSeventh [Monad m] (lookup : List α → Nat → m α) (xs : 
   lookup xs 4 >>= λ fifth =>
   lookup xs 6 >>= λ seventh =>
   pure (first, third, fifth, seventh)
+-- The fact that m must have a Monad instance means that the >>= and pure operations are available.
 
 #eval _firstThirdFifthSeventh (λ xs i => xs[i]?) [7, 8, 12, 4, 3, 10, 1]
+
+-- Identity monad is a monad that has no effects: allows pure code to be used with monadic APIs
+
+def Identity : Type → Type | t => t
+
+instance : Monad Identity where
+  pure x := x
+  bind x f := f x
+
+/-
+
+There is a contract that each instance of Monad should obey.
+
+* `pure` should be a left identity of `bind`, that is, `bind (pure v) f` should be the same as `f v`.
+* `pure` should be a right identity of `bind`, so `bind v pure` is the same as `v`
+* `bind` should be associative, that is, `bind (bind v f) g` is the same as `bind v (λ x => bind (f x) g)`
+
+-/
+
