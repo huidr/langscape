@@ -47,5 +47,41 @@ def _firstThirdFifth' (xs : List α) : Option (α × α × α) :=
 
 infix:55 " ~~> " => _helper     -- 55 is the precedence (e.g., + has precedence 65 and * has 70)
 
+-- larger functions will become more concise now
+def _firstThirdFifthSeventhNinth (xs : List α) : Option (α × α × α × α × α) :=
+  xs[0]? ~~> λ first =>
+  xs[2]? ~~> λ third =>
+  xs[4]? ~~> λ fifth =>
+  xs[6]? ~~> λ seventh =>
+  xs[8]? ~~> λ ninth =>
+  some (first, third, fifth, seventh, ninth)
 
+-- similarly error messages can be propagated too
+-- errors in Lean are like Except α β with constructors error α, 
+def get (xs : List α) (i : Nat) : Except String α :=
+  match xs[i]? with
+  | none => Except.error "Index not found"
+  | some x => Except.ok x
+
+-- the rest can be done similarly, that is, defining helper function and chaining...
+
+/-
+-- Many programs need to traverse a data structure once,
+-- while both computing a main result and accumulating some kind of tertiary extra result.
+-- An example: a function that computes the sum of all the nodes in a tree with an inorder traversal,
+--             while simultaneously recording each nodes visited
+--
+-- The key idea of monads is that each monad encodes a particular kind of side effect
+-- using the tools provided by the pure functional language Lean.
+-- For example, Option represents programs that can fail by returning none,
+--              Except represents programs that can throw exceptions.
+--
+-- To make things easier, Lean standard library provides a type class Monad
+-- Monads have two operations, which are equivalent of ok and _helper
+-/
+
+-- a simplified version looks like...
+class simpleMonad (m : Type → Type) where
+  pure : α → m α
+  bind : m α → (α → m β) → m β
 
