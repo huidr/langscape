@@ -74,7 +74,7 @@ def get (xs : List α) (i : Nat) : Except String α :=
 -- The key idea of monads is that each monad encodes a particular kind of side effect
 -- using the tools provided by the pure functional language Lean.
 -- For example, Option represents programs that can fail by returning none,
---              Except represents programs that can throw exceptions.
+--              Except represents programs that can throw exceptions. 
 --
 -- To make things easier, Lean standard library provides a type class Monad
 -- Monads have two operations, which are equivalent of ok and _helper
@@ -82,6 +82,42 @@ def get (xs : List α) (i : Nat) : Except String α :=
 
 -- a simplified version looks like...
 class simpleMonad (m : Type → Type) where
-  pure : α → m α
-  bind : m α → (α → m β) → m β
+  pure : α → m α                             -- wrapping some value -- puts a value into some context
+  bind : m α → (α → m β) → m β               -- like that helper function -- to chain computations, propagate context
 
+-- Think of a monad as a "wrapped value" + "rules for composition"
+
+-- our Option type
+inductive _Option (α : Type) where
+  | none
+  | some : α → _Option α
+
+-- Monad instance for Option can be created as...
+instance : Monad _Option where
+  pure x := _Option.some x
+  bind opt next := 
+    match opt with
+    | _Option.none => _Option.none
+    | _Option.some x => next x
+
+-- Similary, for Except
+inductive _Except (ε α : Type) where
+  | error : ε → _Except ε α 
+  | ok : α → _Except ε α
+
+instance : Monad (_Except ε) where
+  pure x := _Except.ok x
+  bind attempt next :=
+    match attempt with
+    | _Except.error e => _Except.error e
+    | _Except.ok x => next x
+
+-- the previous function rewritten using Monad
+def _firstThirdFifthSeventh [Monad m] (lookup : List α → Nat → m α) (xs : List α) : m (α × α × α × α) :=
+  lookup xs 0 >>= λ first =>
+  lookup xs 2 >>= λ third =>
+  lookup xs 4 >>= λ fifth =>
+  lookup xs 6 >>= λ seventh =>
+  pure (first, third, fifth, seventh)
+
+#eval _firstThirdFifthSeventh (λ xs i => xs[i]?) [7, 8, 12, 4, 3, 10, 1]
